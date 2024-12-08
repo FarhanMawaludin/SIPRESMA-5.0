@@ -3,8 +3,8 @@
 
 <div class="mt-3" style="margin-left: 317px; margin-right: 32px;">
     <div style="margin-bottom: 17.5px;">
-        <h4 class="fw-semibold">Dashboard</h4>
-        <h6 class="fw-medium text-muted">Home</h6>
+        <h4 class="fw-semibold">Tambah Prestasi</h4>
+        <h6 class="fw-medium text-muted">Home - Prestasi</h6>
     </div>
     <div class="form-section card container container-form mb-5" style="padding:24px 30px 24px 30px;">
         <h5 style="color: #475261;; font-size: 20px; margin-bottom: 20px;" class="fw-semibold">
@@ -238,137 +238,67 @@
                     </small>
                 </div>
             </div>
+            <hr class="separator my-3" />
             <h5 class="fw-semibold mb-3">
-            Mahasiswa berpartisipasi
-        </h5>
-        <div class="table-responsive mb-3">
-            <table class="table table-bordered">
-                <thead>
-                    <tr class="text-center">
-                        <th>
-                            No
-                        </th>
-                        <th>
-                            Mahasiswa
-                        </th>
-                        <th>
-                            Peran
-                        </th>
-                        <th>
-                            Action
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr class="text-center">
-                        <td>
-                            1
-                        </td>
-                        <td>
-                            <select class="form-select">
-                                <option>
-                                    Pilih Mahasiswa
-                                </option>
-                            </select>
-                        </td>
-                        <td>
-                            <select class="form-select">
-                                <option>
-                                    Pilih Peran
-                                </option>
-                                <option value="ketua">
-                                    Ketua
-                                </option>
-                                <option value="anggota">
-                                    Anggota
-                                </option>
-                            </select>
-                        </td>
-                        <td>
-                            <button class="btn btn-danger" type="button">
-                                Hapus
-                            </button>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-        <button class="btn btn-outline-primary mb-3" type="button">
-            Tambah Mahasiswa
-        </button>
-
-
-
-
-        </form>
-    </div>
-</div>
-<div class="form-section card container container-form mb-5" style="padding:24px 30px 24px 30px;">
-    <form>
-        <h5 class="fw-semibold mb-3">
-            Mahasiswa berpartisipasi
-        </h5>
-        <div class="table-responsive mb-3">
-            <table class="table table-bordered">
-                <thead>
-                    <tr class="text-center">
-                        <th>
-                            No
-                        </th>
-                        <th>
-                            Mahasiswa
-                        </th>
-                        <th>
-                            Peran
-                        </th>
-                        <th>
-                            Action
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr class="text-center">
-                        <td>
-                            1
-                        </td>
-                        <td>
-                            <select class="form-select">
-                                <option>
-                                    Pilih Mahasiswa
-                                </option>
-                            </select>
-                        </td>
-                        <td>
-                            <select class="form-select">
-                                <option>
-                                    Pilih Peran
-                                </option>
-                                <option value="ketua">
-                                    Ketua
-                                </option>
-                                <option value="anggota">
-                                    Anggota
-                                </option>
-                            </select>
-                        </td>
-                        <td>
-                            <button class="btn btn-danger" type="button">
-                                Hapus
-                            </button>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-        <button class="btn btn-outline-primary mb-3" type="button">
-            Tambah Mahasiswa
-        </button>
-    </form>
-</div>
-</div>
-<div class="form-section card container container-form mb-5" style="padding:24px 30px 24px 30px;">
-    <form>
-        <h5 class="fw-semibold mb-3">
+                Mahasiswa berpartisipasi
+            </h5>
+            <div class="table-responsive mb-3">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr class="text-center">
+                            <th>
+                                No
+                            </th>
+                            <th>
+                                Mahasiswa
+                            </th>
+                            <th>
+                                Peran
+                            </th>
+                            <th>
+                                Action
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="text-center">
+                            <td>
+                                1
+                            </td>
+                            <td>
+                                <select class="form-select">
+                                    <option>
+                                        Pilih Mahasiswa
+                                    </option>
+                                </select>
+                            </td>
+                            <td>
+                                <select class="form-select">
+                                    <option>
+                                        Pilih Peran
+                                    </option>
+                                    <option value="ketua">
+                                        Ketua
+                                    </option>
+                                    <option value="anggota">
+                                        Anggota
+                                    </option>
+                                </select>
+                            </td>
+                            <td>
+                                <button class="btn btn-danger" type="button">
+                                    Hapus
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <button class="btn btn-outline-primary mb-3" type="button">
+                Tambah Mahasiswa
+            </button>
+            <hr class="separator my-3" />
+            <h5 class="fw-semibold mb-3">
             Dosen Pembimbing
         </h5>
         <div class="table-responsive mb-3">
@@ -420,21 +350,8 @@
         <button class="btn btn-outline-primary mb-3" type="button">
             Tambah Dosen
         </button>
-    </form>
-</div>
-</div>
-<div class="form-section card container container-form mb-5" style="padding:24px 30px 24px 30px;">
-    <form>
-        <div class="d-flex justify-content-end">
-            <button class="btn btn-secondary me-2" type="button">
-                Batal
-            </button>
-            <button class="btn btn-primary" type="submit">
-                Simpan
-            </button>
-        </div>
-    </form>
-</div>
+        </form>
+    </div>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
     integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous">

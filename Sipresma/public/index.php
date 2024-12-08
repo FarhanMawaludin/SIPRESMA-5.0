@@ -88,6 +88,22 @@ switch ($page) {
         $dosenList = $prestasiController->getDosenList();
         include '../app/views/dosen/dosen_prestasi_add.php';
         break;
+    
+    case 'peringkat_akademik':
+        include '../app/views/mahasiswa/peringkat_akademik.php';
+        break;
+
+    case 'dosen_peringkat_akademik':
+        include '../app/views/dosen/dosen_peringkat_akademik.php';
+        break;
+
+    case 'ipk':
+        include '../app/views/mahasiswa/ipk.php';
+        break;
+    
+    case 'bantuan':
+        include '../app/views/mahasiswa/bantuan.php';
+        break;
 
     case 'addPrestasi':
         $data_prestasi = [

@@ -20,19 +20,19 @@
                 </a>
             </li>
             <li>
-                <a href="././../public/index.php?page=dosen_prestasi" class="nav-link <?php echo (isset($_GET['page']) && $_GET['page'] == 'dosen_prestasi') ? 'active' : ''; ?> link-body-emphasis text-white" style="padding: 14px;">
+                <a href="././../public/index.php?page=dosen_prestasi" class="nav-link <?php echo (isset($_GET['page']) && $_GET['page'] == 'dosen_prestasi' || isset($_GET['page']) && $_GET['page'] == 'dosen_prestasi_add' ) ? 'active' : ''; ?> link-body-emphasis text-white" style="padding: 14px;">
                     <i class="bi bi-book me-2"></i>
                     Prestasi
                 </a>
             </li>
             <li>
-                <a href="#" class="nav-link <?php echo (isset($_GET['page']) && $_GET['page'] == 'dataipk') ? 'active' : ''; ?> link-body-emphasis text-white" style="padding: 14px;">
+                <a href="" class="nav-link  link-body-emphasis text-white" style="padding: 14px;">
                     <i class="bi bi-folder2 me-2"></i>
                     Data IPK
                 </a>
             </li>
             <li>
-                <a href="#" class="nav-link link-body-emphasis text-white" style="padding: 14px;">
+                <a href="././../public/index.php?page=dosen_peringkat_akademik" class="nav-link <?php echo (isset($_GET['page']) && $_GET['page'] == 'dosen_peringkat_akademik') ? 'active' : ''; ?> link-body-emphasis text-white" style="padding: 14px;">
                     <i class="bi bi-trophy me-2"></i>
                     Papan Peringkat
                 </a>

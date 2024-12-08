@@ -69,7 +69,7 @@ if (!$user) {
 
             <!-- Profile Section -->
             <div class="col-lg-4 text-center profile-section">
-                <img src="<?php echo htmlspecialchars($user['foto_mahasiswa']); ?>" alt="Foto Profil">
+            <img src="<?php echo htmlspecialchars($user['foto_mahasiswa'] ?? 'default-image.png'); ?>" alt="Foto Profil">
                 <h3 id="profile-name"><?php echo htmlspecialchars($user['nama_mahasiswa']); ?></h3>
                 <p class="text-primary" id="profile-nim">NIM. <?php echo htmlspecialchars($user['NIM']); ?></p>
                 <p>MAHASISWA</p>

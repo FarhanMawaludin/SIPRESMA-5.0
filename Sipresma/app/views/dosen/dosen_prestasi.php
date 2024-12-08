@@ -4,7 +4,7 @@
 
 <div class="mt-3" style="margin-left: 317px; margin-right: 32px;">
     <div style="margin-bottom: 17.5px;">
-        <h4 class="fw-semibold">Dashboard</h4>
+        <h4 class="fw-semibold">Prestasi</h4>
         <h6 class="fw-medium text-muted">Home - Prestasi</h6>
     </div>
 
@@ -40,11 +40,13 @@
 
         <table class="table table-hover ">
             <thead>
-                <tr>
-                    <th>Tanggal Pengajuan</th>
-                    <th>Tahun Akademik</th>
-                    <th>Judul Kompetisi</th>
-                    <th>Status Pengajuan</th>
+                <tr class="text-center">
+                    <th>Juara</th>
+                    <th>Lomba</th>
+                    <th>Tingkat</th>
+                    <th>Waktu Pelaksanaan</th>
+                    <th>Tempat Kompetisi</th>
+                    <th>Status</th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -53,23 +55,46 @@
                 <?php foreach ($prestasiList as $prestasi) : ?>
                 <tr>
                     <!-- Kolom Juara -->
-                    <td class="align-middle text-left">
-                        <?= htmlspecialchars($prestasi['tgl_pengajuan']); ?>
+                    <td class="align-middle text-center">
+                        <?= htmlspecialchars($prestasi['juara']); ?>
                     </td>
 
                     <!-- Kolom Jenis Kompetisi -->
-                    <td class="align-middle text-left">
-                        <?= htmlspecialchars($prestasi['thn_akademik']); ?>
+                    <td class="align-middle text-center">
+                        <?= htmlspecialchars($prestasi['jenis_kompetisi']); ?>
                     </td>
 
                     <!-- Kolom Tingkat Kompetisi -->
-                    <td class="align-middle text-left">
-                        <?= htmlspecialchars($prestasi['judul_kompetisi']); ?>
+                    <td class="align-middle text-center">
+                        <?= htmlspecialchars($prestasi['tingkat_kompetisi']); ?>
+                    </td>
+
+                    <!-- Kolom Waktu Pelaksanaan -->
+                    <td class="align-middle text-center">
+                        <?= htmlspecialchars(
+                            $prestasi['tanggal_mulai'] instanceof DateTime 
+                                ? $prestasi['tanggal_mulai']->format('Y-m-d') 
+                                : $prestasi['tanggal_mulai'], 
+                            ENT_QUOTES, 'UTF-8'
+                        ); ?>
+                        -      
+                        <?= htmlspecialchars(
+                            $prestasi['tanggal_selesai'] instanceof DateTime
+                            ? $prestasi['tanggal_selesai']->format('Y-m-d')
+                            : $prestasi['tanggal_selesai'],
+                            ENT_QUOTES, 'UTF-8'
+                            ); ?>
+                    </td>
+
+                    <!-- Kolom Tempat Kompetisi -->
+                    <td class="align-middle text-center">
+                        <?= htmlspecialchars($prestasi['tempat_kompetisi']); ?>
                     </td>
 
 
+
                     <!-- Kolom Status Pengajuan -->
-                    <td class="align-middle text-left">
+                    <td class="align-middle text-center">
                         <span style="
                         background-color: <?= 
                             $prestasi['status_pengajuan'] === 'disetujui' ? '#DCFCE7' : 
@@ -88,21 +113,15 @@
                     </td>
 
                     <!-- Kolom Actions -->
-                    <td class="align-middle text-left">
-                        <div class="d-flex align-items-center justify-content-start gap-1">
-                            <!-- Tombol Detail
-                            <a href="index.php?page=dosen_prestasi_detail&id_prestasi="
-                                class="btn btn-outline-primary btn-xs">
-                                <i class="fas fa-file-alt"></i>
-                            </a> -->
-
-                            <!-- Tombol Edit -->
-                            <a href="index.php?page=dosen_prestasi_detail&id_prestasi=<?php echo $prestasi['id_prestasi']; ?>"
-                                class="btn btn-outline-warning btn-xs">
-                                <i class="fas fa-edit"></i>
-                            </a>
-                        </div>
-                    </td>
+                    <td class="align-middle text-center">
+                    <div class="d-flex align-items-center justify-content-center gap-1">
+                        <!-- Tombol Detail -->
+                        <a href="index.php?page=prestasidetail&id_prestasi=<?php echo $prestasi['id_prestasi']; ?>" class="btn btn-outline-primary btn-xs">
+                            <i class="fas fa-file-alt"></i>
+                        </a>
+                    </div>
+                </td>
+                    
                 </tr>
                 <?php endforeach; ?>
                 <?php else : ?>

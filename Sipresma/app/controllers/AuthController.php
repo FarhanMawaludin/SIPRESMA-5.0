@@ -14,7 +14,8 @@ class AuthController
         $this->userModel = new UserModel($conn);
     }
 
-    public function login() {
+    public function login()
+    {
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             // Ambil input dan bersihkan dari spasi
             $username = trim($_POST['username']);
@@ -39,16 +40,12 @@ class AuthController
                 // Arahkan pengguna berdasarkan role
                 switch ($user['role']) {
                     case 'dosen':
-                        header("Location: index.php?page=dosen_dashboard");
-                        break;
                     case 'ketua jurusan':
-                        header("Location: index.php?page=dosen_dashboard"); // Dashboard dengan fitur terbatas
+                    case 'admin':
+                        header("Location: index.php?page=dosen_dashboard");
                         break;
                     case 'mahasiswa':
                         header("Location: index.php?page=home");
-                        break;
-                    case 'admin':
-                        header("Location: index.php?page=dosen_dashboard");
                         break;
                     default:
                         $_SESSION['error'] = "Peran tidak dikenal!";
@@ -84,7 +81,8 @@ class AuthController
         return true; // Sesi masih aktif
     }
 
-    public function editProfileMahasiswa() {
+    public function editProfileMahasiswa()
+    {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Validasi input
             $data = [
@@ -95,12 +93,14 @@ class AuthController
                 'tanggal_lahir' => $_POST['tanggal_lahir'] ?? ''
             ];
 
+            // Validasi data wajib diisi
             if (empty($data['nama']) || empty($data['email']) || empty($data['tempat_lahir']) || empty($data['tanggal_lahir'])) {
                 $_SESSION['error'] = "Semua field wajib diisi!";
                 header("Location: index.php?page=edit");
                 exit();
             }
 
+            // Validasi format email
             if (!filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
                 $_SESSION['error'] = "Format email tidak valid!";
                 header("Location: index.php?page=edit");
@@ -131,8 +131,5 @@ class AuthController
         header("Location: index.php?page=edit");
         exit();
     }
-    
 }
-
-
 ?>

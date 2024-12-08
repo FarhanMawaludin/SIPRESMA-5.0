@@ -25,7 +25,7 @@
 
 
 <body>
-    <nav class="navbar navbar-expand-lg bg-body-tertiary">
+    <nav class="navbar navbar-expand-lg bg-body-tertiary shadow-sm">
         <div class="container">
             <!-- Logo -->
             <img class="logo-sipresma" src="././../assets/img/Logo 4x.png" alt="SIPRESMA-LOGO" href="#"
@@ -41,19 +41,22 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link <?php echo (isset($_GET['page']) && $_GET['page'] == 'prestasi') ? 'active' : ''; ?>"
+                        <a class="nav-link <?php echo (isset($_GET['page']) && $_GET['page'] == 'prestasi' || isset($_GET['page']) && $_GET['page'] == 'tambahprestasi') ? 'active' : ''; ?>"
                             href="././../public/index.php?page=prestasi">
                             Prestasi
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">IPK</a>
+                        <a class="nav-link <?php echo (isset($_GET['page']) && $_GET['page'] == 'ipk') ? 'active' : ''; ?>"
+                         href="././../public/index.php?page=ipk">IPK</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="peringkatakademik.html">Leaderboard</a>
+                        <a class="nav-link  <?php echo (isset($_GET['page']) && $_GET['page'] == 'peringkat_akademik') ? 'active' : ''; ?>"
+                         href="././../public/index.php?page=peringkat_akademik">Leaderboard</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">Bantuan</a>
+                        <a class="nav-link <?php echo (isset($_GET['page']) && $_GET['page'] == 'bantuan') ? 'active' : ''; ?>"
+                         href="././../public/index.php?page=bantuan">Bantuan</a>
                     </li>
                 </ul>
             </div>
