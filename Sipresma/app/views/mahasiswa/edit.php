@@ -20,12 +20,12 @@ if (!$user) {
     <!-- Main Content -->
     <div class="container my-5">
 
-    <div class="row">
+        <div class="row">
             <!-- Form Section -->
             <div class="col-lg-8">
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-            Isi identitas anda dengan lengkap. Jika sudah selesai, klik tombol simpan.
-            </div>
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    Isi identitas anda dengan lengkap. Jika sudah selesai, klik tombol simpan.
+                </div>
                 <form method="POST" action="index.php?action=edit">
                     <div class="row mb-3">
                         <div class="col-md-6">
@@ -44,12 +44,14 @@ if (!$user) {
                         <div class="col-md-6">
                             <label for="tempat-lahir" class="form-label">Tempat Lahir</label>
                             <input type="text" class="form-control" id="tempat-lahir" name="tempat_lahir"
-                                value="<?php echo htmlspecialchars($user['tempat_lahir']); ?>" required>
+                                value="<?php echo isset($user['tempat_lahir']) ? htmlspecialchars($user['tempat_lahir']) : ''; ?>"
+                                required>
                         </div>
                         <div class="col-md-6">
                             <label for="tanggal-lahir" class="form-label">Tanggal Lahir</label>
                             <input type="date" class="form-control" id="tanggal-lahir" name="tanggal_lahir"
-                                value="<?php echo htmlspecialchars($user['tanggal_lahir']); ?>" required>
+                                value="<?php echo isset($user['tanggal_lahir']) ? htmlspecialchars($user['tanggal_lahir']) : ''; ?>"
+                                required>
                         </div>
                     </div>
 
@@ -61,7 +63,8 @@ if (!$user) {
                         </div>
                     </div>
 
-                    <button type="submit" class="btn btn-primary fw-medium" style="background-color: #244282; border: none;">
+                    <button type="submit" class="btn btn-primary fw-medium"
+                        style="background-color: #244282; border: none;">
                         <i class="fa fa-check"></i> Simpan Perubahan
                     </button>
                 </form>
@@ -69,7 +72,8 @@ if (!$user) {
 
             <!-- Profile Section -->
             <div class="col-lg-4 text-center profile-section">
-            <img src="<?php echo htmlspecialchars($user['foto_mahasiswa'] ?? 'default-image.png'); ?>" alt="Foto Profil">
+                <img src="<?php echo htmlspecialchars($user['foto_mahasiswa'] ?? 'default-image.png'); ?>"
+                    alt="Foto Profil">
                 <h3 id="profile-name"><?php echo htmlspecialchars($user['nama_mahasiswa']); ?></h3>
                 <p class="text-primary" id="profile-nim">NIM. <?php echo htmlspecialchars($user['NIM']); ?></p>
                 <p>MAHASISWA</p>

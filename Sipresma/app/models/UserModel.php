@@ -12,7 +12,7 @@ class UserModel
     public function validateLogin($username, $password)
 {
     // Cek login mahasiswa
-    $queryMahasiswa = "SELECT id_mahasiswa,NIM, nama_mahasiswa,email_mahasiswa,tempat_lahir,tanggal_lahir, 'mahasiswa' AS role FROM mahasiswa WHERE NIM = :username AND password_mahasiswa = :password";
+    $queryMahasiswa = "SELECT id_mahasiswa,NIM, nama_mahasiswa,email_mahasiswa, 'mahasiswa' AS role FROM mahasiswa WHERE NIM = :username AND password_mahasiswa = :password";
     $stmtMahasiswa = $this->conn->prepare($queryMahasiswa);
     $stmtMahasiswa->bindParam(':username', $username);
     $stmtMahasiswa->bindParam(':password', $password);

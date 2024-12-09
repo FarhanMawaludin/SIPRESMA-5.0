@@ -1,4 +1,5 @@
-<?php include 'partials/header.php'?>
+<?php include 'partials/header.php' ?>
+
 <div class="mb-5">
     <p class="info-text fw-light">Home - Prestasi - Detail Prestasi</p>
 </div>
@@ -59,6 +60,7 @@
                     </div>
                 </div>
             </div>
+
             <!-- Surat Tugas -->
             <div class="card mb-4 shadow-sm">
                 <div class="card-header bg-white fw-bold" style=" font-size: 16px;">Surat Tugas</div>
@@ -72,20 +74,32 @@
                         <div class="col-md-6">
                             <p class="mb-0 fw-bold">Tanggal Surat Tugas</p>
                             <p class="mb-0" style="color: #495057;">
-                                <?php echo htmlspecialchars($prestasi['tgl_surat_tugas']); ?></p>
+                                <?php echo htmlspecialchars($prestasi['tgl_surat_tugas'] ?? '', ENT_QUOTES, 'UTF-8'); ?>
+                            </p>
                         </div>
                     </div>
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <p class="fw-bold" style="margin-bottom: 4px;">File Surat Tugas</p>
-                            <div class="input-group ">
-                                <span class="input-group-text"><i class="fas fa-file-pdf text-danger"></i></span>
-                                <input class="form-control" type="text" value="file.pdf" readonly />
-                            </div>
+                            <?php if ($prestasi['file_surat_tugas'] !== null) : ?>
+                            <?php
+                                
+                                $filePath = '../../../public/uploads/' . $prestasi['id_prestasi'] . '.pdf';
+                                file_put_contents($filePath, $prestasi['file_surat_tugas']);
+                                echo "<td><a href='" . $filePath . "' target='_blank'><button>View Surat Tugas</button></a> ";
+                                echo "<a href='" . $filePath . "' download><button>Download Surat Tugas</button></a></td>";
+                            ?>
+                            <!-- If the file is an image, show the image preview -->
+
+                            <?php else : ?>
+                            <p>No file available</p>
+                            <?php endif; ?>
                         </div>
                     </div>
+
                 </div>
             </div>
+
             <!-- Lampiran -->
             <div class="card mb-4 shadow-sm">
                 <div class="card-header bg-white fw-bold" style=" font-size: 16px;">Lampiran</div>
@@ -93,26 +107,55 @@
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <p class="mb-0 fw-bold" style="margin-bottom: 4px;">File Sertifikat</p>
-                            <div class="input-group">
-                                <span class="input-group-text"><i class="fas fa-file-pdf text-danger"></i></span>
-                                <input class="form-control" type="text" value="file.pdf" readonly />
-                            </div>
+                            <?php if ($prestasi['file_sertifikat'] !== null) : ?>
+                            <a href="../../public/uploads/<?php echo htmlspecialchars($prestasi['id_prestasi']) . '.pdf'; ?>"
+                                target="_blank">
+                                <button class="btn btn-primary">View Sertifikat</button>
+                            </a>
+                            <a href="uploads/<?php echo htmlspecialchars($prestasi['id_prestasi']) . '.pdf'; ?>"
+                                download>
+                                <button class="btn btn-success">Download Sertifikat</button>
+                            </a>
+                            <?php else : ?>
+                            <p>No file available</p>
+                            <?php endif; ?>
                         </div>
                         <div class="col-md-6">
-                            <p class="mb-0 fw-bold" style="margin-bottom: 4px;">Foto Kegiatan</p>
-                            <div class="input-group">
-                                <span class="input-group-text"><i class="fas fa-file-pdf text-danger"></i></span>
-                                <input class="form-control" type="text" value="file.pdf" readonly />
+                            <p class="fw-bold" style="margin-bottom: 4px;">Foto Kegiatan</p>
+                            <?php if (!empty($prestasi['foto_kegiatan'])) : ?>
+                            <?php
+                            $fotoFilePath = '../public/uploads' . $prestasi['foto_kegiatan']; // Gunakan path relatif dari database
+                            ?>
+                            <a href="<?= $fotoFilePath ?>" target="_blank">
+                                <button>View Foto Kegiatan</button>
+                            </a>
+                            <a href="<?= $fotoFilePath ?>" download>
+                                <button>Download Foto Kegiatan</button>
+                            </a>
+                            <div style="margin-top: 10px;">
+                                <img src="<?= $fotoFilePath ?>" alt="Foto Kegiatan"
+                                    style="max-width: 100%; height: auto;">
                             </div>
+                            <?php else : ?>
+                            <p>No file available</p>
+                            <?php endif; ?>
                         </div>
                     </div>
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <p class="mb-0 fw-bold" style="margin-bottom: 4px;">File Poster</p>
-                            <div class="input-group ">
-                                <span class="input-group-text"><i class="fas fa-file-pdf text-danger"></i></span>
-                                <input class="form-control" type="text" value="file.pdf" readonly />
-                            </div>
+                            <?php if ($prestasi['lampiran_hasil_kompetisi'] !== null) : ?>
+                            <a href="../../public/uploads/<?php echo htmlspecialchars($prestasi['id_prestasi']) . '.pdf'; ?>"
+                                target="_blank">
+                                <button class="btn btn-primary">View Poster</button>
+                            </a>
+                            <a href="../../public/uploads/<?php echo htmlspecialchars($prestasi['id_prestasi']) . '.pdf'; ?>"
+                                download>
+                                <button class="btn btn-success">Download Poster</button>
+                            </a>
+                            <?php else : ?>
+                            <p>No file available</p>
+                            <?php endif; ?>
                         </div>
                     </div>
                 </div>
@@ -162,6 +205,3 @@
 </div>
 
 <?php include 'partials/footer.php'; ?>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-    integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous">
-</script>

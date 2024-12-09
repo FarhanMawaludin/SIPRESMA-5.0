@@ -38,6 +38,72 @@ class PrestasiController
         include '../app/views/mahasiswa/prestasidetail.php';
     }
 
+    public function submitForm()
+{
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        // Path direktori upload
+        $uploadDir = realpath(__DIR__ . '/../../public/uploads/') . '/';
+
+        // Pastikan folder `uploads` ada
+        if (!is_dir($uploadDir)) {
+            mkdir($uploadDir, 0755, true);
+        }
+
+        // Menangani file upload
+        $file_surat_tugas = $this->handleFileUpload($_FILES['file_surat_tugas'], $uploadDir, 'surat_tugas_');
+        $foto_kegiatan = $this->handleFileUpload($_FILES['foto_kegiatan'], $uploadDir, 'foto_kegiatan_');
+        $file_sertifikat = $this->handleFileUpload($_FILES['file_sertifikat'], $uploadDir, 'sertifikat_');
+        $file_poster = $this->handleFileUpload($_FILES['file_poster'], $uploadDir, 'poster_');
+        $lampiran_hasil_kompetisi = $this->handleFileUpload($_FILES['lampiran_hasil_kompetisi'], $uploadDir, 'lampiran_');
+
+        $id_mahasiswa = $_SESSION['user']['id_mahasiswa'];
+
+        // Data input
+        $data = [
+            'tgl_pengajuan' => date('Y-m-d H:i:s'),
+            'thn_akademik' => $_POST['thn_akademik'],
+            'jenis_kompetisi' => $_POST['jenis_kompetisi'],
+            'juara' => $_POST['juara'],
+            'url_kompetisi' => $_POST['url_kompetisi'],
+            'program_studi' => $_POST['program_studi'],
+            'tingkat_kompetisi' => $_POST['tingkat_kompetisi'],
+            'judul_kompetisi' => $_POST['judul_kompetisi'],
+            'tempat_kompetisi' => $_POST['tempat_kompetisi'],
+            'jumlah_pt' => $_POST['jumlah_pt'],
+            'jumlah_peserta' => $_POST['jumlah_peserta'],
+            'foto_kegiatan' => $foto_kegiatan,
+            'no_surat_tugas' => $_POST['no_surat_tugas'],
+            'tgl_surat_tugas' => date('Y-m-d', strtotime($_POST['tgl_surat_tugas'])),
+            'file_surat_tugas' => $file_surat_tugas,
+            'file_sertifikat' => $file_sertifikat,
+            'file_poster' => $file_poster,
+            'lampiran_hasil_kompetisi' => $lampiran_hasil_kompetisi,
+            'id_mahasiswa' => $id_mahasiswa
+        ];
+
+        // Simpan ke database
+        $success = $this->prestasiModel->insertPrestasi($data);
+
+        if ($success) {
+            header('Location: index.php?page=prestasi');
+        } else {
+            echo "Error inserting data into database.";
+        }
+    }
+}
+
+private function handleFileUpload($file, $uploadDir, $prefix)
+{
+    if (isset($file) && $file['error'] == 0) {
+        $filePath = $uploadDir . $prefix . uniqid() . '_' . basename($file['name']);
+        if (move_uploaded_file($file['tmp_name'], $filePath)) {
+            return str_replace(realpath($uploadDir), '', $filePath); // Simpan relative path
+        }
+    }
+    return null;
+}
+
+
     public function addPrestasi($data_prestasi, $mahasiswa_ids, $dosen_ids, $files)
     {
         try {

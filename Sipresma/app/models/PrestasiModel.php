@@ -30,6 +30,56 @@ class PrestasiModel
         return $prestasiList;
     }
 
+    public function insertPrestasi($data)
+{
+    
+    $sql = "INSERT INTO [dbo].[data_prestasi] 
+            ([tgl_pengajuan], [thn_akademik], [jenis_kompetisi], [juara], [url_kompetisi], [program_studi], 
+             [tingkat_kompetisi], [judul_kompetisi], [tempat_kompetisi], [jumlah_pt], [jumlah_peserta], 
+             [foto_kegiatan], [no_surat_tugas], [tgl_surat_tugas], [file_surat_tugas], 
+             [file_sertifikat], [file_poster], [lampiran_hasil_kompetisi], [status_pengajuan],[id_mahasiswa]) 
+        VALUES 
+            (:tgl_pengajuan, :thn_akademik, :jenis_kompetisi, :juara, :url_kompetisi, :program_studi, 
+             :tingkat_kompetisi, :judul_kompetisi, :tempat_kompetisi, :jumlah_pt, :jumlah_peserta, 
+             CONVERT(VARBINARY(MAX), :foto_kegiatan), :no_surat_tugas, :tgl_surat_tugas, 
+             CONVERT(VARBINARY(MAX), :file_surat_tugas), CONVERT(VARBINARY(MAX), :file_sertifikat), 
+             CONVERT(VARBINARY(MAX), :file_poster), CONVERT(VARBINARY(MAX), :lampiran_hasil_kompetisi), 
+             'Waiting for Approval',:id_mahasiswa)";
+
+    $stmt = $this->conn->prepare($sql);
+    $stmt->setAttribute(PDO::SQLSRV_ATTR_ENCODING, PDO::SQLSRV_ENCODING_SYSTEM);
+    try {
+        $stmt->execute([
+            ':tgl_pengajuan' => $data['tgl_pengajuan'],
+            ':thn_akademik' => $data['thn_akademik'],
+            ':jenis_kompetisi' => $data['jenis_kompetisi'],
+            ':juara' => $data['juara'],
+            ':url_kompetisi' => $data['url_kompetisi'],
+            ':program_studi' => $data['program_studi'],
+            ':tingkat_kompetisi' => $data['tingkat_kompetisi'],
+            ':judul_kompetisi' => $data['judul_kompetisi'],
+            ':tempat_kompetisi' => $data['tempat_kompetisi'],
+            ':jumlah_pt' => $data['jumlah_pt'],
+            ':jumlah_peserta' => $data['jumlah_peserta'],
+            ':foto_kegiatan' => $data['foto_kegiatan'],
+            ':no_surat_tugas' => $data['no_surat_tugas'],
+            ':tgl_surat_tugas' => $data['tgl_surat_tugas'],
+            ':file_surat_tugas' => $data['file_surat_tugas'],
+            ':file_sertifikat' => $data['file_sertifikat'],
+            ':file_poster' => $data['file_poster'],
+            ':lampiran_hasil_kompetisi' => $data['lampiran_hasil_kompetisi'],
+            ':id_mahasiswa' => $data['id_mahasiswa']
+        ]);
+        return true;
+    } catch (PDOException $e) {
+        die("Error inserting data: " . $e->getMessage());
+    }
+}
+
+
+
+
+
     public function getPrestasiById($id_prestasi)
     {
         // Query untuk mendapatkan data prestasi
@@ -51,7 +101,9 @@ class PrestasiModel
         dp.tgl_surat_tugas,
         dp.file_surat_tugas,
         dp.file_sertifikat,
-        dp.foto_kegiatan
+        dp.foto_kegiatan,
+        dp.file_poster,
+        dp.lampiran_hasil_kompetisi
 
     FROM 
         data_prestasi dp

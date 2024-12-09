@@ -1,6 +1,6 @@
 <?php
 $host = "LAPTOP-CACRPO0M\SQLEXPRESS";
-$dbname = "sipresma";
+$dbname = "PBLSIPRESMA";
 $username = "";
 $password = "";
 

@@ -42,8 +42,7 @@ $prestasiList = $prestasiController->showPrestasi($id_mahasiswa);
                 <th>Juara</th>
                 <th>Lomba</th>
                 <th>Tingkat</th>
-                <th>Waktu Pelaksanaan</th>
-                <th>Penyelenggara</th>
+                <th>Tempat Kompetisi</th>
                 <th>Status</th>
                 <th>Actions</th>
             </tr>
@@ -68,14 +67,7 @@ $prestasiList = $prestasiController->showPrestasi($id_mahasiswa);
                 </td>
 
                 <!-- Kolom Waktu Pelaksanaan -->
-                <td class="align-middle text-left">
-                    <?= htmlspecialchars(
-                        $prestasi['tanggal_mulai'] instanceof DateTime 
-                            ? $prestasi['tanggal_mulai']->format('Y-m-d') 
-                            : $prestasi['tanggal_mulai'], 
-                        ENT_QUOTES, 'UTF-8'
-                    ); ?>
-                </td>
+            
 
                 <!-- Kolom Tempat Kompetisi -->
                 <td class="align-middle text-left">

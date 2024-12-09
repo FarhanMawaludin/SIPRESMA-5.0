@@ -19,8 +19,6 @@
     <link rel="stylesheet" href="././../assets/css/mahasiswa/profile.css">
     <link rel="stylesheet" href="././../assets/css/mahasiswa/editprofile.css">
     <link rel="stylesheet" href="././../assets/css/mahasiswa/tabelprestasi.css">
-
-   
 </head>
 
 

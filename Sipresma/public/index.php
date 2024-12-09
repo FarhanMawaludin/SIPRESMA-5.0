@@ -26,6 +26,10 @@ if ($action === 'edit') {
     $authController->editprofilemahasiswa();
 }
 
+if ($action === 'submit_prestasi') {
+    $prestasiController->submitForm();
+}
+
 switch ($page) {
     case 'homepertama':
         include '../app/views/homepertama.php';
