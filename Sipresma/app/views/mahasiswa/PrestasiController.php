@@ -21,12 +21,6 @@ class PrestasiController
         return $this->prestasiModel->getPrestasiByMahasiswa($id_mahasiswa);
     }
 
-    public function showPrestasiDosen($id_dosen, $role)
-    {
-        // Ambil daftar prestasi berdasarkan id dosen
-        return $this->prestasiModel->getPrestasiByDosen($id_dosen, $_SESSION['role']);
-    }
-
     public function getDosenList()
     {
         return $this->prestasiModel->getAllDosen();
@@ -41,17 +35,11 @@ class PrestasiController
 
     public function showPrestasiDetailMahasiswa($id_prestasi)
     {   
+        $mahasiswa = $this->prestasiModel->getPrestasiById($id_prestasi);
+        $dosen = $this->prestasiModel->getPrestasiById($id_prestasi);
         $prestasi = $this->prestasiModel->getPrestasiById($id_prestasi);
         include '../app/views/mahasiswa/prestasidetail.php';
     }
-
-    public function showPrestasiDetailDosen($id_prestasi)
-    {   
-        $prestasi = $this->prestasiModel->getPrestasiById($id_prestasi);
-        include '../app/views/dosen/dosen_prestasi_detail.php';
-    }
-
-
 
     public function submitForm()
 {

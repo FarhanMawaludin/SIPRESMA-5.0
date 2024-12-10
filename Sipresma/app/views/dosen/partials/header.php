@@ -23,8 +23,6 @@
     
 </head>
 
-
-
 <body>
     <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm" style="border-radius: 0px">
         <div class="container-fluid" style="padding-left: 32px; padding-right: 32px;">

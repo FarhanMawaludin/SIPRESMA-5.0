@@ -40,20 +40,7 @@ if (!$user) {
                         </div>
                     </div>
 
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <label for="tempat-lahir" class="form-label">Tempat Lahir</label>
-                            <input type="text" class="form-control" id="tempat-lahir" name="tempat_lahir"
-                                value="<?php echo isset($user['tempat_lahir']) ? htmlspecialchars($user['tempat_lahir']) : ''; ?>"
-                                required>
-                        </div>
-                        <div class="col-md-6">
-                            <label for="tanggal-lahir" class="form-label">Tanggal Lahir</label>
-                            <input type="date" class="form-control" id="tanggal-lahir" name="tanggal_lahir"
-                                value="<?php echo isset($user['tanggal_lahir']) ? htmlspecialchars($user['tanggal_lahir']) : ''; ?>"
-                                required>
-                        </div>
-                    </div>
+                    
 
                     <div class="row mb-3">
                         <div class="col-md-6">

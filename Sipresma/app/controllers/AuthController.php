@@ -88,13 +88,11 @@ class AuthController
             $data = [
                 'nim' => $_SESSION['user']['NIM'],
                 'nama' => $_POST['nama'] ?? '',
-                'email' => $_POST['email'] ?? '',
-                'tempat_lahir' => $_POST['tempat_lahir'] ?? '',
-                'tanggal_lahir' => $_POST['tanggal_lahir'] ?? ''
+                'email' => $_POST['email'] ?? ''
             ];
 
             // Validasi data wajib diisi
-            if (empty($data['nama']) || empty($data['email']) || empty($data['tempat_lahir']) || empty($data['tanggal_lahir'])) {
+            if (empty($data['nama']) || empty($data['email'])) {
                 $_SESSION['error'] = "Semua field wajib diisi!";
                 header("Location: index.php?page=edit");
                 exit();
@@ -114,8 +112,6 @@ class AuthController
                 // Update session data
                 $_SESSION['user']['nama_mahasiswa'] = $data['nama'];
                 $_SESSION['user']['email_mahasiswa'] = $data['email'];
-                $_SESSION['user']['tempat_lahir'] = $data['tempat_lahir'];
-                $_SESSION['user']['tanggal_lahir'] = $data['tanggal_lahir'];
 
                 $_SESSION['success'] = "Profil berhasil diperbarui!";
                 header("Location: index.php?page=profile");

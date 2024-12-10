@@ -79,6 +79,15 @@ switch ($page) {
         }
         break;
 
+    case 'dosen_prestasi_detail':
+        $id_prestasi = $_GET['id_prestasi'] ?? 0;
+        if ($id_prestasi > 0) {
+            $prestasiController->showPrestasiDetailDosen($id_prestasi);
+        } else {
+            echo "ID Prestasi tidak valid.";
+        }
+        break;
+
     case 'login':
         include '../app/views/login.php';
         break;

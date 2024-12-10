@@ -44,9 +44,7 @@ class UserModel
             UPDATE mahasiswa 
             SET 
                 nama_mahasiswa = :nama, 
-                email_mahasiswa = :email, 
-                tempat_lahir = :tempat_lahir, 
-                tanggal_lahir = :tanggal_lahir 
+                email_mahasiswa = :email 
             WHERE 
                 NIM = :nim
         ";
@@ -57,8 +55,6 @@ class UserModel
         $stmt->bindParam(':nim', $data['nim']);
         $stmt->bindParam(':nama', $data['nama']);
         $stmt->bindParam(':email', $data['email']);
-        $stmt->bindParam(':tempat_lahir', $data['tempat_lahir']);
-        $stmt->bindParam(':tanggal_lahir', $data['tanggal_lahir']);
 
         $stmt->execute();
         return $stmt->rowCount();

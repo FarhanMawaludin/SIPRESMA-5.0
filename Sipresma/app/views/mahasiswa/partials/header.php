@@ -19,6 +19,9 @@
     <link rel="stylesheet" href="././../assets/css/mahasiswa/profile.css">
     <link rel="stylesheet" href="././../assets/css/mahasiswa/editprofile.css">
     <link rel="stylesheet" href="././../assets/css/mahasiswa/tabelprestasi.css">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous">
+    </script>
 </head>
 
 
@@ -46,15 +49,15 @@
                     </li>
                     <li class="nav-item">
                         <a class="nav-link <?php echo (isset($_GET['page']) && $_GET['page'] == 'ipk') ? 'active' : ''; ?>"
-                         href="././../public/index.php?page=ipk">IPK</a>
+                            href="././../public/index.php?page=ipk">IPK</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link  <?php echo (isset($_GET['page']) && $_GET['page'] == 'peringkat_akademik') ? 'active' : ''; ?>"
-                         href="././../public/index.php?page=peringkat_akademik">Leaderboard</a>
+                            href="././../public/index.php?page=peringkat_akademik">Leaderboard</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link <?php echo (isset($_GET['page']) && $_GET['page'] == 'bantuan') ? 'active' : ''; ?>"
-                         href="././../public/index.php?page=bantuan">Bantuan</a>
+                            href="././../public/index.php?page=bantuan">Bantuan</a>
                     </li>
                 </ul>
             </div>
