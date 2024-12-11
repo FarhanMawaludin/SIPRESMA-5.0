@@ -17,47 +17,28 @@ class AuthController
     public function login()
     {
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-            // Ambil input dan bersihkan dari spasi
-            $username = trim($_POST['username']);
-            $password = trim($_POST['password']);
+            $username = $_POST['username'];
+            $password = $_POST['password'];
 
-            // Validasi input
-            if (empty($username) || empty($password)) {
-                $_SESSION['error'] = "Username atau password tidak boleh kosong!";
-                header("Location: ./views/login.php");
-                exit();
+            if (strlen($username) < 5 || strlen($password) < 5) {
+                echo "Username dan password harus minimal 5 karakter.";
+                return;
             }
 
-            // Validasi login
             $user = $this->userModel->validateLogin($username, $password);
 
             if ($user) {
-                // Jika login berhasil, simpan data pengguna ke dalam session
                 $_SESSION['user'] = $user;
+                $_SESSION['role'] = $user['role'] ?? '';
                 $_SESSION['loggedin_time'] = time();
-                $_SESSION['role'] = $user['role']; // Role: mahasiswa, dosen, atau kajur
 
-                // Arahkan pengguna berdasarkan role
-                switch ($user['role']) {
-                    case 'dosen':
-                    case 'ketua jurusan':
-                    case 'admin':
-                        header("Location: index.php?page=dosen_dashboard");
-                        break;
-                    case 'mahasiswa':
-                        header("Location: index.php?page=home");
-                        break;
-                    default:
-                        $_SESSION['error'] = "Peran tidak dikenal!";
-                        header("Location: index.php?page=login");
-                        break;
+                if (isset($user['role_dosen'])) {
+                    header("Location: index.php?page=dosen_dashboard");
+                } else {
+                    header("Location: index.php?page=home");
                 }
-                exit();
             } else {
-                // Jika login gagal
-                $_SESSION['error'] = "Username atau password salah!";
-                header("Location: index.php?page=login");
-                exit();
+                echo "NIM/NIDN atau password salah.";
             }
         }
     }
@@ -66,19 +47,17 @@ class AuthController
     {
         session_unset();
         session_destroy();
-        header("Location: index.php?page=homepertama");
+        header("Location: index.php?page=login&message=logged_out");
         exit();
     }
-
     public function isSessionActive()
     {
-        // Cek apakah sesi aktif
         if (isset($_SESSION['loggedin_time']) && (time() - $_SESSION['loggedin_time'] > 3600)) {
             session_destroy();
-            header("Location: ../public/login.php?message=session_expired");
+            header("Location: index.php?page=login&message=session_expired");
             exit();
         }
-        return true; // Sesi masih aktif
+        return true;
     }
 
     public function editProfileMahasiswa()
@@ -128,4 +107,3 @@ class AuthController
         exit();
     }
 }
-?>

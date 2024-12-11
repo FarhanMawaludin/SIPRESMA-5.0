@@ -16,66 +16,65 @@
         rel="stylesheet">
     <link rel="stylesheet" href="././../assets/css/mahasiswa/style.css">
     <link rel="stylesheet" href="././../assets/css/admin/sidebar.css">
-    <link rel="stylesheet" href="././../assets/css/admin/navbar.css">    
+    <link rel="stylesheet" href="././../assets/css/admin/navbar.css">
     <link rel="stylesheet" href="././../assets/css/style.css">
     <link rel="stylesheet" href="././../assets/css/header.css">
     <link rel="stylesheet" href="././../assets/css/mahasiswa/profile.css">
-    
+
+
 </head>
 
 <body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm" style="border-radius: 0px">
+    <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm fixed-top" style="border-radius: 0px">
         <div class="container-fluid" style="padding-left: 32px; padding-right: 32px;">
             <div class="d-flex align-items-center ms-auto" style="gap: 12px;">
                 <div class="card p-2">
                     <i class="bi bi-sun text-muted"></i>
                 </div>
                 <div class="user-info">
-                <div class="d-flex flex-column text-end">
-                    <p class="info-text-nav" style="font-weight:600; font-size: 15px;">
-                        <?php echo isset($_SESSION['user']['nama_dosen']) ? $_SESSION['user']['nama_dosen'] : 'Dosen'; ?>
-                    </p>
-                    <p class="info-text-nav" style="color:#AEAEB2; font-size: 13px;">
-                        <?php echo isset($_SESSION['user']['NIDN']) ? $_SESSION['user']['NIDN'] : 'NIDN'; ?>
-                    </p>
+                    <div class="d-flex flex-column text-end">
+                        <p class="info-text-nav" style="font-weight:600; font-size: 15px;">
+                            <?php echo isset($_SESSION['user']['nama_dosen']) ? $_SESSION['user']['nama_dosen'] : 'Dosen'; ?>
+                        </p>
+                        <p class="info-text-nav" style="color:#AEAEB2; font-size: 13px;">
+                            <?php echo isset($_SESSION['user']['NIDN']) ? $_SESSION['user']['NIDN'] : 'NIDN'; ?>
+                        </p>
+                    </div>
+
+                    <!-- Dropdown Trigger -->
+                    <div class="dropdown position-relative d-flex align-items-center">
+                        <!-- Avatar -->
+                        <img src="././../assets/img/animoji.png" alt="User Image" class="dropdown-toggle mb-1"
+                            id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false"
+                            style="cursor: pointer; width: 40px; height: 40px; border-radius: 50%;">
+
+                        <!-- Arrow Icon -->
+                        <i class="bi bi-caret-down-fill ms-2" data-bs-toggle="dropdown" aria-expanded="false"
+                            style="cursor: pointer; font-size: 16px; color: #6c757d;"></i>
+
+                        <!-- Dropdown Menu -->
+                        <ul class="dropdown-menu dropdown-menu-end fw-semibold custom-dropdown"
+                            aria-labelledby="dropdownMenuButton">
+                            <li>
+                                <a class="dropdown-item d-flex align-items-center" href="index.php?page=profile">
+                                    <i class="bi bi-person-fill me-2"></i> View Profile
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item d-flex align-items-center" href="index.php?action=logout">
+                                    <i class="bi bi-box-arrow-right me-2"></i> Logout
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
                 </div>
 
-                <!-- Dropdown Trigger -->
-                <div class="dropdown position-relative d-flex align-items-center">
-                    <!-- Avatar -->
-                    <img src="././../assets/img/animoji.png" alt="User Image" class="dropdown-toggle mb-1"
-                        id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false"
-                        style="cursor: pointer; width: 40px; height: 40px; border-radius: 50%;">
 
-                    <!-- Arrow Icon -->
-                    <i class="bi bi-caret-down-fill ms-2" data-bs-toggle="dropdown" aria-expanded="false"
-                        style="cursor: pointer; font-size: 16px; color: #6c757d;"></i>
-
-                    <!-- Dropdown Menu -->
-                    <ul class="dropdown-menu dropdown-menu-end fw-semibold custom-dropdown"
-                        aria-labelledby="dropdownMenuButton">
-                        <li>
-                            <a class="dropdown-item d-flex align-items-center" href="index.php?page=profile">
-                                <i class="bi bi-person-fill me-2"></i> View Profile
-                            </a>
-                        </li>
-                        <li>
-                            <a class="dropdown-item d-flex align-items-center" href="index.php?action=logout">
-                                <i class="bi bi-box-arrow-right me-2"></i> Logout
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-
-
-            <!-- Navbar Toggler for mobile view -->
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
-                data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
-                aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
+                    aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
             </div>
         </div>
     </nav>
-

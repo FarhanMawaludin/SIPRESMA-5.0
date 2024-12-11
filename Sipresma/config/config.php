@@ -1,15 +1,17 @@
 <?php
-$host = "LAPTOP-CACRPO0M\SQLEXPRESS";
-$dbname = "PBLSIPRESMA";
-$username = "";
-$password = "";
+// config.php
 
-try {
-    $conn = new PDO("sqlsrv:Server=$host;Database=$dbname", $username, $password);
-    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-} catch (PDOException $e) {
-    echo "Koneksi gagal: " . $e->getMessage();
-    die();
+$serverName = "LAPTOP-CACRPO0M\SQLEXPRESS";
+$connectionOptions = array(
+    "Database" => "PBLSIPRESMA",
+    "Uid" => "",
+    "PWD" => ""
+);
+
+$conn = sqlsrv_connect($serverName, $connectionOptions);
+
+if (!$conn) {
+    die(print_r(sqlsrv_errors(), true));
 }
 
-?>
+return $conn;

@@ -6,60 +6,70 @@ class UserModel
 
     public function __construct($conn)
     {
-        $this->conn = $conn; // $conn should be a PDO instance
+        $this->conn = $conn;
     }
 
     public function validateLogin($username, $password)
-{
-    // Cek login mahasiswa
-    $queryMahasiswa = "SELECT id_mahasiswa,NIM, nama_mahasiswa,email_mahasiswa, 'mahasiswa' AS role FROM mahasiswa WHERE NIM = :username AND password_mahasiswa = :password";
-    $stmtMahasiswa = $this->conn->prepare($queryMahasiswa);
-    $stmtMahasiswa->bindParam(':username', $username);
-    $stmtMahasiswa->bindParam(':password', $password);
-    $stmtMahasiswa->execute();
+    {
+        // mhs
+        $sqlMahasiswa = "SELECT * FROM mahasiswa WHERE NIM = ? AND password_mahasiswa = ?";
+        $stmt = sqlsrv_prepare($this->conn, $sqlMahasiswa, array(&$username, &$password));
 
-    $resultMahasiswa = $stmtMahasiswa->fetch(PDO::FETCH_ASSOC);
-    if ($resultMahasiswa) {
-        return $resultMahasiswa; // Mengembalikan data mahasiswa
+        if (sqlsrv_execute($stmt)) {
+            $result = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC);
+            if ($result) {
+                $result['role'] = 'mahasiswa';
+                return $result;
+            }
+        }
+
+        // dosen
+        $sqlDosen = "SELECT id_dosen, NIDN, role_dosen, nama_dosen FROM dosen WHERE NIDN = ? AND password_dosen = ?";
+        $stmt = sqlsrv_prepare($this->conn, $sqlDosen, array(&$username, &$password));
+
+        if (sqlsrv_execute($stmt)) {
+            $result = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC);
+            if ($result) {
+                $result['role'] = $result['role_dosen'];
+                return $result;
+            }
+        }
+
+        return false;
     }
-
-    // Cek login dosen/kajur
-    $queryDosen = "SELECT id_dosen, NIDN, nama_dosen, role_dosen AS role FROM dosen WHERE NIDN = :username AND password_dosen = :password";
-    $stmtDosen = $this->conn->prepare($queryDosen);
-    $stmtDosen->bindParam(':username', $username);
-    $stmtDosen->bindParam(':password', $password);
-    $stmtDosen->execute();
-
-    $resultDosen = $stmtDosen->fetch(PDO::FETCH_ASSOC);
-    if ($resultDosen) {
-        return $resultDosen; // Mengembalikan data dosen/kajur
-    }
-
-    return null; // Tidak ditemukan data login
-}
-
 
     public function updateProfile($data) {
         $query = "
             UPDATE mahasiswa 
             SET 
-                nama_mahasiswa = :nama, 
-                email_mahasiswa = :email 
+                nama_mahasiswa = ?, 
+                email_mahasiswa = ? 
             WHERE 
-                NIM = :nim
+                NIM = ?
         ";
-
-        $stmt = $this->conn->prepare($query);
-
-        // Bind parameter
-        $stmt->bindParam(':nim', $data['nim']);
-        $stmt->bindParam(':nama', $data['nama']);
-        $stmt->bindParam(':email', $data['email']);
-
-        $stmt->execute();
-        return $stmt->rowCount();
+    
+        // Menyiapkan pernyataan dengan sqlsrv_prepare
+        $params = [
+            $data['nama'],
+            $data['email'],
+            $data['nim']
+        ];
+    
+        $stmt = sqlsrv_prepare($this->conn, $query, $params);
+    
+        // Menjalankan pernyataan
+        if (!$stmt) {
+            die(print_r(sqlsrv_errors(), true));
+        }
+    
+        if (sqlsrv_execute($stmt)) {
+            // Memeriksa jumlah baris yang diperbarui
+            $rowsAffected = sqlsrv_rows_affected($stmt);
+            sqlsrv_free_stmt($stmt); // Membersihkan statement
+            return $rowsAffected; // Mengembalikan jumlah baris yang diperbarui
+        } else {
+            die(print_r(sqlsrv_errors(), true));
+        }
     }
     
-    
 }
-?>

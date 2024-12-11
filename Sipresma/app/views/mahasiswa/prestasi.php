@@ -84,7 +84,7 @@ $prestasiList = $prestasiController->showPrestasi($id_mahasiswa);
                         <a href="index.php?page=prestasidetail&id_prestasi=<?php echo $prestasi['id_prestasi']; ?>" class="btn btn-outline-primary btn-xs">
                             <i class="fas fa-file-alt"></i>
                         </a>
-                        <a href="edit.php?id=<?= $prestasi['id_prestasi']; ?>" class="btn btn-outline-warning btn-xs">
+                        <a href="index.php?page=prestasiedit&id_prestasi=<?php echo $prestasi['id_prestasi']; ?>" class="btn btn-outline-warning btn-xs">
                             <i class="fas fa-edit"></i>
                         </a>
                     </div>

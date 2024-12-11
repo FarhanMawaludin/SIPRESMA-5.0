@@ -7,6 +7,7 @@ require_once '../app/controllers/PrestasiController.php';
 $authController = new AuthController($conn);
 $prestasiController = new PrestasiController($conn);
 
+// session
 if (isset($_SESSION['user'])) {
     $authController->isSessionActive();
 }
@@ -27,7 +28,11 @@ if ($action === 'edit') {
 }
 
 if ($action === 'submit_prestasi') {
-    $prestasiController->submitForm();
+    $prestasiController->handlePostRequest();
+}
+
+if ($action === 'edit_prestasi') {
+    $prestasiController->handleEditRequest();
 }
 
 switch ($page) {
@@ -45,6 +50,10 @@ switch ($page) {
 
     case 'edit':
         include '../app/views/mahasiswa/edit.php';
+        break;
+    
+    case 'prestasiedit':
+        include '../app/views/mahasiswa/prestasiedit.php';
         break;
 
     case 'dosen_dashboard':
@@ -101,7 +110,7 @@ switch ($page) {
         $dosenList = $prestasiController->getDosenList();
         include '../app/views/dosen/dosen_prestasi_add.php';
         break;
-    
+
     case 'peringkat_akademik':
         include '../app/views/mahasiswa/peringkat_akademik.php';
         break;
@@ -113,7 +122,7 @@ switch ($page) {
     case 'ipk':
         include '../app/views/mahasiswa/ipk.php';
         break;
-    
+
     case 'bantuan':
         include '../app/views/mahasiswa/bantuan.php';
         break;
@@ -168,16 +177,4 @@ switch ($page) {
     default:
         echo "Halaman tidak ditemukan.";
         break;
-}
-
-// Actions outside switch
-if (isset($_POST['setujui']) && isset($_GET['id_prestasi'])) {
-    $id_prestasi = $_GET['id_prestasi'];
-    $prestasiController->setujuiPrestasi($id_prestasi);
-}
-
-if (isset($_POST['tolak']) && isset($_GET['id_prestasi']) && isset($_POST['alasan'])) {
-    $id_prestasi = $_GET['id_prestasi'];
-    $alasan = $_POST['alasan'];
-    $prestasiController->tolakPrestasi($id_prestasi, $alasan);
 }

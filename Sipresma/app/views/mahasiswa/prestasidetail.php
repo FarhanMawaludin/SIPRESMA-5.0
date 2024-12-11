@@ -105,7 +105,13 @@
                         <div class="col-md-6">
                             <p class="mb-1 fw-bold">Tanggal Surat Tugas</p>
                             <p class="mb-0 text-secondary">
-                                <?= htmlspecialchars($prestasi['tgl_surat_tugas'] ?? '', ENT_QUOTES, 'UTF-8'); ?>
+                                <?= htmlspecialchars(
+                                    $prestasi['tgl_surat_tugas'] instanceof DateTime 
+                                        ? $prestasi['tgl_surat_tugas']->format('Y-m-d') 
+                                        : $prestasi['tgl_surat_tugas'] ?? '', 
+                                    ENT_QUOTES, 
+                                    'UTF-8'
+                                ); ?>
                             </p>
                         </div>
                     </div>
@@ -114,31 +120,36 @@
                     <div class="row">
                         <div class="col-md-6">
                             <p class="fw-bold mb-2">File Surat Tugas</p>
-                            <?php if (!empty($prestasi['file_surat_tugas'])) : ?>
-                            <?php
-                    $filePath = '../public/uploads/' . $prestasi['file_surat_tugas']; // Path file relatif
-                    $fileName = basename($filePath); // Mendapatkan nama file
-                    ?>
-                            <!-- Preview Kecil -->
-                            <div class="mb-3">
-                                <img src="<?= $filePath ?>" alt="Preview File Surat Tugas" class="img-thumbnail"
-                                    style="max-width: 150px;">
-                            </div>
-                            <!-- Nama File -->
-                            <p class="text-secondary small mb-3"><?= htmlspecialchars($fileName); ?></p>
+                            <?php 
+                            if ($prestasi['file_surat_tugas'] !== null) {
+                                $fotoFilePath = 'uploads/ST_' . $prestasi['id_prestasi'] . '.jpg';
+                                file_put_contents($fotoFilePath, $prestasi['file_surat_tugas']);
+                                echo "<button class='btn btn-primary' data-bs-toggle='modal' data-bs-target='#viewModal'>View Foto</button> ";
+                                echo "<a href='" . $fotoFilePath . "' download><button class='btn btn-success'>Download Foto</button></a>";
 
-                            <!-- Tombol View dan Download -->
-                            <div class="d-flex gap-2">
-                                <a href="<?= $filePath ?>" target="_blank" class="btn btn-primary btn-sm">
-                                    View File
-                                </a>
-                                <a href="<?= $filePath ?>" download class="btn btn-success btn-sm">
-                                    Download File
-                                </a>
-                            </div>
-                            <?php else : ?>
-                            <p class="text-danger">File tidak tersedia</p>
-                            <?php endif; ?>
+                                // Modal for preview
+                                echo "
+                                <div class='modal fade' id='viewModal' tabindex='-1' aria-labelledby='viewModalLabel' aria-hidden='true'>
+                                    <div class='modal-dialog'>
+                                        <div class='modal-content'>
+                                            <div class='modal-header'>
+                                                <h5 class='modal-title' id='viewModalLabel'>Preview Foto Surat Tugas</h5>
+                                                <button type='button' class='btn-close' data-bs-dismiss='modal' aria-label='Close'></button>
+                                            </div>
+                                            <div class='modal-body'>
+                                                <img src='$fotoFilePath' alt='Foto Surat Tugas' class='img-fluid'>
+                                            </div>
+                                            <div class='modal-footer'>
+                                                <button type='button' class='btn btn-secondary' data-bs-dismiss='modal'>Close</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                ";
+                            } else {
+                                echo "<td>No photo available</td>";
+                            }
+                            ?>
                         </div>
                     </div>
                 </div>
@@ -147,165 +158,194 @@
 
             <!-- Lampiran -->
             <div class="card mb-4 shadow-sm">
-                <div class="card-header bg-white fw-bold" style=" font-size: 16px;">Lampiran</div>
+                <div class="card-header bg-white fw-bold" style="font-size: 16px;">Lampiran</div>
                 <div class="card-body">
                     <div class="row mb-3">
                         <!-- File Sertifikat -->
                         <div class="col-md-6">
                             <p class="fw-bold mb-2">File Sertifikat</p>
-                            <?php if (!empty($prestasi['file_sertifikat'])) : ?>
-                            <?php
-                                $filePathSertifikat = '../public/uploads/' . $prestasi['file_sertifikat']; // Path file relatif
-                                $fileNameSertifikat = basename($filePathSertifikat); // Mendapatkan nama file
-                                ?>
-                            <!-- Preview Kecil -->
-                            <div class="mb-3">
-                                <img src="<?= $filePathSertifikat ?>" alt="Preview File Sertifikat"
-                                    class="img-thumbnail" style="max-width: 150px;">
-                            </div>
-                            <!-- Nama File -->
-                            <p class="text-secondary small mb-3"><?= htmlspecialchars($fileNameSertifikat); ?></p>
-                            <!-- Tombol View dan Download -->
-                            <div class="d-flex gap-2">
-                                <a href="<?= $filePathSertifikat ?>" target="_blank" class="btn btn-primary btn-sm">
-                                    View File
-                                </a>
-                                <a href="<?= $filePathSertifikat ?>" download class="btn btn-success btn-sm">
-                                    Download File
-                                </a>
-                            </div>
-                            <?php else : ?>
-                            <p class="text-danger">File tidak tersedia</p>
-                            <?php endif; ?>
-                        </div>
+                            <?php 
+                            if ($prestasi['file_sertifikat'] !== null) {
+                                $fotoFilePath = 'uploads/sertif_' . $prestasi['id_prestasi'] . '.jpg';
+                                file_put_contents($fotoFilePath, $prestasi['file_sertifikat']);
+                                echo "<button class='btn btn-primary' data-bs-toggle='modal' data-bs-target='#viewModalSertifikat'>View Foto</button> ";
+                                echo "<a href='" . $fotoFilePath . "' download><button class='btn btn-success'>Download Foto</button></a>";
+
+                                // Modal for preview of Sertifikat
+                                echo "
+                                <div class='modal fade' id='viewModalSertifikat' tabindex='-1' aria-labelledby='viewModalLabelSertifikat' aria-hidden='true'>
+                                    <div class='modal-dialog'>
+                                        <div class='modal-content'>
+                                            <div class='modal-header'>
+                                                <h5 class='modal-title' id='viewModalLabelSertifikat'>Preview Foto Sertifikat</h5>
+                                                <button type='button' class='btn-close' data-bs-dismiss='modal' aria-label='Close'></button>
+                                            </div>
+                                            <div class='modal-body'>
+                                                <img src='$fotoFilePath' alt='Foto Sertifikat' class='img-fluid'>
+                                            </div>
+                                            <div class='modal-footer'>
+                                                <a href='$fotoFilePath' download><button class='btn btn-success'>Download Foto</button></a>
+                                                <button type='button' class='btn btn-secondary' data-bs-dismiss='modal'>Close</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                ";
+                            } else {
+                                echo "<td>No photo available</td>";
+                            }
+                            ?>
+                                    </div>
 
                         <!-- Foto Kegiatan -->
                         <div class="col-md-6">
                             <p class="fw-bold mb-2">Foto Kegiatan</p>
-                            <?php if (!empty($prestasi['foto_kegiatan'])) : ?>
-                            <?php
-                                $filePathFoto = '../public/uploads/' . $prestasi['foto_kegiatan']; // Path file relatif
-                                $fileNameFoto = basename($filePathFoto); // Mendapatkan nama file
-                                ?>
-                            <!-- Preview Kecil -->
-                            <div class="mb-3">
-                                <img src="<?= $filePathFoto ?>" alt="Preview Foto Kegiatan" class="img-thumbnail"
-                                    style="max-width: 150px;">
-                            </div>
-                            <!-- Nama File -->
-                            <p class="text-secondary small mb-3"><?= htmlspecialchars($fileNameFoto); ?></p>
-                            <!-- Tombol View dan Download -->
-                            <div class="d-flex gap-2">
-                                <a href="<?= $filePathFoto ?>" target="_blank" class="btn btn-primary btn-sm">
-                                    View File
-                                </a>
-                                <a href="<?= $filePathFoto ?>" download class="btn btn-success btn-sm">
-                                    Download File
-                                </a>
-                            </div>
-                            <?php else : ?>
-                            <p class="text-danger">File tidak tersedia</p>
-                            <?php endif; ?>
+                            <?php 
+                            if ($prestasi['foto_kegiatan'] !== null) {
+                                $fotoFilePath = 'uploads/foto_' . $prestasi['id_prestasi'] . '.jpg';
+                                file_put_contents($fotoFilePath, $prestasi['foto_kegiatan']);
+                                echo "<button class='btn btn-primary' data-bs-toggle='modal' data-bs-target='#viewModalFotoKegiatan'>View Foto</button> ";
+                                echo "<a href='" . $fotoFilePath . "' download><button class='btn btn-success'>Download Foto</button></a>";
+
+                                // Modal for preview of Foto Kegiatan
+                                echo "
+                                <div class='modal fade' id='viewModalFotoKegiatan' tabindex='-1' aria-labelledby='viewModalLabelFotoKegiatan' aria-hidden='true'>
+                                    <div class='modal-dialog'>
+                                        <div class='modal-content'>
+                                            <div class='modal-header'>
+                                                <h5 class='modal-title' id='viewModalLabelFotoKegiatan'>Preview Foto Kegiatan</h5>
+                                                <button type='button' class='btn-close' data-bs-dismiss='modal' aria-label='Close'></button>
+                                            </div>
+                                            <div class='modal-body'>
+                                                <img src='$fotoFilePath' alt='Foto Kegiatan' class='img-fluid'>
+                                            </div>
+                                            <div class='modal-footer'>
+                                                <a href='$fotoFilePath' download><button class='btn btn-success'>Download Foto</button></a>
+                                                <button type='button' class='btn btn-secondary' data-bs-dismiss='modal'>Close</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                ";
+                            } else {
+                                echo "<td>No photo available</td>";
+                            }
+                            ?>
                         </div>
                     </div>
-                    <div class="row ">
-                        <!-- File Sertifikat -->
+
+                    <div class="row">
+                        <!-- File Poster -->
                         <div class="col-md-6">
                             <p class="fw-bold mb-2">File Poster</p>
-                            <?php if (!empty($prestasi['file_poster'])) : ?>
-                            <?php
-                            $filePathSertifikat = '../public/uploads/' . $prestasi['file_poster']; // Path file relatif
-                            $fileNameSertifikat = basename($filePathSertifikat); // Mendapatkan nama file
+                            <?php 
+                            if ($prestasi['file_poster'] !== null) {
+                                $fotoFilePath = 'uploads/poster_' . $prestasi['id_prestasi'] . '.jpg';
+                                file_put_contents($fotoFilePath, $prestasi['file_poster']);
+                                echo "<button class='btn btn-primary' data-bs-toggle='modal' data-bs-target='#viewModalPoster'>View Foto</button> ";
+                                echo "<a href='" . $fotoFilePath . "' download><button class='btn btn-success'>Download Foto</button></a>";
+
+                                // Modal for preview of Poster
+                                echo "
+                                <div class='modal fade' id='viewModalPoster' tabindex='-1' aria-labelledby='viewModalLabelPoster' aria-hidden='true'>
+                                    <div class='modal-dialog'>
+                                        <div class='modal-content'>
+                                            <div class='modal-header'>
+                                                <h5 class='modal-title' id='viewModalLabelPoster'>Preview Foto Poster</h5>
+                                                <button type='button' class='btn-close' data-bs-dismiss='modal' aria-label='Close'></button>
+                                            </div>
+                                            <div class='modal-body'>
+                                                <img src='$fotoFilePath' alt='Foto Poster' class='img-fluid'>
+                                            </div>
+                                            <div class='modal-footer'>
+                                                <a href='$fotoFilePath' download><button class='btn btn-success'>Download Foto</button></a>
+                                                <button type='button' class='btn btn-secondary' data-bs-dismiss='modal'>Close</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                ";
+                            } else {
+                                echo "<td>No photo available</td>";
+                            }
                             ?>
-                            <!-- Preview Kecil -->
-                            <div class="mb-3">
-                                <img src="<?= $filePathSertifikat ?>" alt="Preview File Poster" class="img-thumbnail"
-                                    style="max-width: 150px;">
-                            </div>
-                            <!-- Nama File -->
-                            <p class="text-secondary small mb-3"><?= htmlspecialchars($fileNameSertifikat); ?></p>
-                            <!-- Tombol View dan Download -->
-                            <div class="d-flex gap-2">
-                                <a href="<?= $filePathSertifikat ?>" target="_blank" class="btn btn-primary btn-sm">
-                                    View File
-                                </a>
-                                <a href="<?= $filePathSertifikat ?>" download class="btn btn-success btn-sm">
-                                    Download File
-                                </a>
-                            </div>
-                            <?php else : ?>
-                            <p class="text-danger">File tidak tersedia</p>
-                            <?php endif; ?>
-                        </div>
+                                    </div>
 
-                        <!-- Foto Kegiatan -->
-                        <div class="col-md-6">
-                            <p class="fw-bold mb-2">Hasil Karya</p>
-                            <?php if (!empty($prestasi['lampiran_hasil_kompetisi'])) : ?>
-                            <?php
-                            $filePathFoto = '../public/uploads/' . $prestasi['lampiran_hasil_kompetisi']; // Path file relatif
-                            $fileNameFoto = basename($filePathFoto); // Mendapatkan nama file
+                                    <!-- Hasil Karya -->
+                                    <div class="col-md-6">
+                                        <p class="fw-bold mb-2">Hasil Karya</p>
+                                        <?php 
+                            if ($prestasi['lampiran_hasil_kompetisi'] !== null) {
+                                $fotoFilePath = 'uploads/karya_' . $prestasi['id_prestasi'] . '.jpg';
+                                file_put_contents($fotoFilePath, $prestasi['lampiran_hasil_kompetisi']);
+                                echo "<button class='btn btn-primary' data-bs-toggle='modal' data-bs-target='#viewModalHasilKarya'>View Foto</button> ";
+                                echo "<a href='" . $fotoFilePath . "' download><button class='btn btn-success'>Download Foto</button></a>";
+
+                                // Modal for preview of Hasil Karya
+                                echo "
+                                <div class='modal fade' id='viewModalHasilKarya' tabindex='-1' aria-labelledby='viewModalLabelHasilKarya' aria-hidden='true'>
+                                    <div class='modal-dialog'>
+                                        <div class='modal-content'>
+                                            <div class='modal-header'>
+                                                <h5 class='modal-title' id='viewModalLabelHasilKarya'>Preview Hasil Karya</h5>
+                                                <button type='button' class='btn-close' data-bs-dismiss='modal' aria-label='Close'></button>
+                                            </div>
+                                            <div class='modal-body'>
+                                                <img src='$fotoFilePath' alt='Hasil Karya' class='img-fluid'>
+                                            </div>
+                                            <div class='modal-footer'>
+                                                <a href='$fotoFilePath' download><button class='btn btn-success'>Download Foto</button></a>
+                                                <button type='button' class='btn btn-secondary' data-bs-dismiss='modal'>Close</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                ";
+                            } else {
+                                echo "<td>No photo available</td>";
+                            }
                             ?>
-                            <!-- Preview Kecil -->
-                            <div class="mb-3">
-                                <img src="<?= $filePathFoto ?>" alt="Preview Hasil Karya" class="img-thumbnail"
-                                    style="max-width: 150px;">
-                            </div>
-                            <!-- Nama File -->
-                            <p class="text-secondary small mb-3"><?= htmlspecialchars($fileNameFoto); ?></p>
-                            <!-- Tombol View dan Download -->
-                            <div class="d-flex gap-2">
-                                <a href="<?= $filePathFoto ?>" target="_blank" class="btn btn-primary btn-sm">
-                                    View File
-                                </a>
-                                <a href="<?= $filePathFoto ?>" download class="btn btn-success btn-sm">
-                                    Download File
-                                </a>
-                            </div>
-                            <?php else : ?>
-                            <p class="text-danger">File tidak tersedia</p>
-                            <?php endif; ?>
-                        </div>
-                    </div>
-                </div>
-
-
-            </div>
-        </div>
-        <div class="col-lg-4">
-            <!-- Mahasiswa yang Berpartisipasi -->
-            <div class="card mb-4 shadow-sm">
-                <div class="card-header bg-white fw-bold" style="font-size: 16px;">Mahasiswa yang Berpartisipasi</div>
-                <div class="card-body">
-                    <div class="d-flex align-items-center mb-3">
-                        <img src="../../img/animoji.png" alt="Profile" class="rounded-circle"
-                            style="width: 40px; height: 40px;">
-                        <div class="ms-2">
-                            <p class="mb-0 fw-bold">
-                                <?php echo htmlspecialchars($prestasi['nama_mahasiswa'] ?? 'null'); ?></p>
-                            <p class="mb-0" style="color: #495057;">D-IV Teknik Informatika</p>
                         </div>
                     </div>
                 </div>
             </div>
-            <!-- Dosen Pembimbing -->
-            <div class="card mb-4 shadow-sm">
-                <div class="card-header bg-white fw-bold" style="font-size: 16px;">Dosen Pembimbing</div>
-                <div class="card-body">
-                    <div class="d-flex align-items-center">
-                        <img src="https://via.placeholder.com/40" alt="Profile" class="rounded-circle"
-                            style="width: 40px; height: 40px;">
-                        <div class="ms-2">
-                            <p class="mb-0 fw-bold"><?php echo htmlspecialchars($prestasi['nama_dosen'] ?? 'null'); ?>
-                            </p>
-                            <p class="mb-0" style="color: #495057;">Dosen</p>
+            </div>
+            <div class="col-lg-4">
+                <!-- Mahasiswa yang Berpartisipasi -->
+                <div class="card mb-4 shadow-sm">
+                    <div class="card-header bg-white fw-bold" style="font-size: 16px;">Mahasiswa yang Berpartisipasi
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex align-items-center mb-3">
+                            <img src="../../img/animoji.png" alt="Profile" class="rounded-circle"
+                                style="width: 40px; height: 40px;">
+                            <div class="ms-2">
+                                <p class="mb-0 fw-bold">
+                                    <?php echo htmlspecialchars($prestasi['nama_mahasiswa'] ?? 'null'); ?></p>
+                                <p class="mb-0" style="color: #495057;">D-IV Teknik Informatika</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Dosen Pembimbing -->
+                <div class="card mb-4 shadow-sm">
+                    <div class="card-header bg-white fw-bold" style="font-size: 16px;">Dosen Pembimbing</div>
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <img src="https://via.placeholder.com/40" alt="Profile" class="rounded-circle"
+                                style="width: 40px; height: 40px;">
+                            <div class="ms-2">
+                                <p class="mb-0 fw-bold">
+                                    <?php echo htmlspecialchars($prestasi['nama_dosen'] ?? 'null'); ?>
+                                </p>
+                                <p class="mb-0" style="color: #495057;">Dosen</p>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 
 
-<?php include 'partials/footer.php'; ?>
+    <?php include 'partials/footer.php'; ?>

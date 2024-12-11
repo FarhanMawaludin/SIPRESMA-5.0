@@ -10,139 +10,366 @@ class PrestasiModel
     }
     public function getAllPrestasi()
     {
-        $query = "SELECT * FROM data_prestasi";
-        $stmt = $this->conn->query($query);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
-    
+        $query = "SELECT * FROM data_prestasi ORDER BY tgl_pengajuan DESC";
 
-    public function getPrestasiByMahasiswa($id_mahasiswa)
+        $stmt = sqlsrv_query($this->conn, $query);
+
+        if ($stmt === false) {
+            die(print_r(sqlsrv_errors(), true));
+        }
+
+        $result = [];
+        while ($row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC)) {
+            $result[] = $row;
+        }
+
+        return $result;
+    }
+
+    public function getPrestasiForDetail($id_prestasi)
     {
-        $query = "SELECT * FROM data_prestasi WHERE id_mahasiswa = :id_mahasiswa  ORDER BY tgl_pengajuan DESC";
-    
-        $stmt = $this->conn->prepare($query);
-    
-        $stmt->bindParam(':id_mahasiswa', $id_mahasiswa, PDO::PARAM_INT);
-    
-        $stmt->execute();
-    
-        $prestasiList = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    
-        return $prestasiList;
+        $query = "SELECT * FROM 
+            data_prestasi dp
+          WHERE dp.id_prestasi = ?";
+
+        $stmt = sqlsrv_query($this->conn, $query, array($id_prestasi));
+
+        if ($stmt === false) {
+            die(print_r(sqlsrv_errors(), true));
+        }
+
+        $prestasi = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC);
+
+        $queryMahasiswa = "SELECT m.nama_mahasiswa FROM mahasiswa m INNER JOIN prestasi_mahasiswa mp ON m.id_mahasiswa = mp.id_mahasiswa WHERE mp.id_prestasi = ?";
+        $stmtMahasiswa = sqlsrv_query($this->conn, $queryMahasiswa, array($id_prestasi));
+
+        if ($stmtMahasiswa === false) {
+            die(print_r(sqlsrv_errors(), true));
+        }
+
+        $mahasiswa = [];
+        while ($row = sqlsrv_fetch_array($stmtMahasiswa, SQLSRV_FETCH_ASSOC)) {
+            $mahasiswa[] = $row['nama_mahasiswa'];
+        }
+
+        $queryDosen = "SELECT d.nama_dosen FROM dosen d INNER JOIN pembimbing_prestasi dpd ON d.id_dosen = dpd.id_dosen WHERE dpd.id_prestasi = ?";
+        $stmtDosen = sqlsrv_query($this->conn, $queryDosen, array($id_prestasi));
+
+        if ($stmtDosen === false) {
+            die(print_r(sqlsrv_errors(), true));
+        }
+
+        $dosen = [];
+        while ($row = sqlsrv_fetch_array($stmtDosen, SQLSRV_FETCH_ASSOC)) {
+            $dosen[] = $row['nama_dosen'];
+        }
+
+        return $prestasi;
     }
 
-    public function getPrestasiByDosen($id_dosen, $role)
-{
-    if ($role === 'admin') {
-        // Query untuk admin: Menampilkan semua data prestasi
-        $query = "SELECT * FROM data_prestasi dp 
-                  INNER JOIN pembimbing_prestasi pp 
-                  ON dp.id_prestasi = pp.id_prestasi 
-                  ORDER BY dp.tgl_pengajuan DESC";
-        $stmt = $this->conn->prepare($query);
-    } else {
-        // Query untuk dosen atau ketua jurusan: Filter berdasarkan id_dosen
-        $query = "SELECT * FROM data_prestasi dp 
-                  INNER JOIN pembimbing_prestasi pp 
-                  ON dp.id_prestasi = pp.id_prestasi 
-                  WHERE pp.id_dosen = :id_dosen 
-                  ORDER BY dp.tgl_pengajuan DESC";
-        $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(':id_dosen', $id_dosen, PDO::PARAM_INT);
+    public function getHistoryApprovalByPrestasiId($id_prestasi)
+    {
+        $query = "SELECT 
+                ha.status_approval,
+                ha.alasan,
+                ha.tgl_approval,
+                d.nama_dosen
+              FROM 
+                history_approval ha
+              LEFT JOIN 
+                dosen d ON ha.dosen_id = d.id_dosen
+              WHERE 
+                ha.id_prestasi = ?
+              ORDER BY 
+                ha.tgl_approval DESC";
+
+        // Execute the query using sqlsrv_query
+        $stmt = sqlsrv_query($this->conn, $query, array($id_prestasi));
+
+        if ($stmt === false) {
+            die(print_r(sqlsrv_errors(), true)); // Handle query execution failure
+        }
+
+        // Fetch all results as an associative array
+        $historyApproval = [];
+        while ($row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC)) {
+            $historyApproval[] = $row;
+        }
+
+        return $historyApproval; // Return all history approval records
     }
 
-    $stmt->execute();
-    return $stmt->fetchAll(PDO::FETCH_ASSOC);
-}
+    public function getAllMahasiswa()
+    {
+        $query = "SELECT * FROM mahasiswa";
 
-  
+        // Execute the query using sqlsrv_query
+        $stmt = sqlsrv_query($this->conn, $query);
 
+        if ($stmt === false) {
+            die(print_r(sqlsrv_errors(), true)); // Handle query execution failure
+        }
+
+        // Fetch all results as an associative array
+        $mahasiswa = [];
+        while ($row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC)) {
+            $mahasiswa[] = $row;
+        }
+
+        return $mahasiswa; // Return all mahasiswa records
+    }
+
+    public function getAllDosen()
+    {
+        $query = "SELECT * FROM dosen";
+
+        // Execute the query using sqlsrv_query
+        $stmt = sqlsrv_query($this->conn, $query);
+
+        if ($stmt === false) {
+            die(print_r(sqlsrv_errors(), true)); // Handle query execution failure
+        }
+
+        // Fetch all results as an associative array
+        $dosen = [];
+        while ($row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC)) {
+            $dosen[] = $row;
+        }
+
+        return $dosen; // Return all dosen records
+    }
+
+
+    public function getMahasiswaByPrestasi($id_prestasi)
+    {
+        try {
+            // Query untuk mendapatkan mahasiswa berdasarkan id_prestasi
+            $query = "SELECT mahasiswa.id_mahasiswa, 
+                         mahasiswa.nama_mahasiswa, 
+                         mahasiswa.email_mahasiswa, 
+                         mahasiswa_prestasi.id_prestasi
+                  FROM mahasiswa
+                  JOIN prestasi_mahasiswa ON mahasiswa.id_mahasiswa = mahasiswa_prestasi.id_mahasiswa
+                  WHERE mahasiswa_prestasi.id_prestasi = ?";
+
+            // Menyiapkan parameter untuk query
+            $params = [$id_prestasi];
+
+            // Eksekusi query
+            $stmt = sqlsrv_query($this->conn, $query, $params);
+
+            if ($stmt === false) {
+                throw new Exception(print_r(sqlsrv_errors(), true));
+            }
+
+            // Menyimpan hasil query ke array
+            $mahasiswaData = [];
+            while ($row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC)) {
+                $mahasiswaData[] = $row;
+            }
+
+            // Mengembalikan data
+            return $mahasiswaData;
+        } catch (Exception $e) {
+            // Tangani error jika terjadi
+            error_log("Error in getMahasiswaByPrestasi: " . $e->getMessage());
+            return false;
+        }
+    }
+
+
+    public function getDosenByPrestasi($id_prestasi)
+    {
+        try {
+            $query = "SELECT dosen.id_dosen, dosen.nama_dosen, dosen.email_dosen 
+                      FROM dosen 
+                      JOIN pembimbing_prestasi ON dosen.id_dosen = pembimbing_prestasi.id_dosen 
+                      WHERE pembimbing_prestasi.id_prestasi = :id_prestasi";
+
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(':id_prestasi', $id_prestasi, PDO::PARAM_INT);
+            $stmt->execute();
+
+            $dosenData = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            return $dosenData;
+        } catch (Exception $e) {
+            return false;
+        }
+    }
+
+    public function addPrestasi($data_prestasi, $mahasiswa_ids, $dosen_ids)
+    {
+        try {
+            $this->conn->beginTransaction();
+
+            // Ensure the current date is assigned to tgl_pengajuan
+            $data_prestasi['tgl_pengajuan'] = date('Y-m-d H:i:s');
+
+            // Validate file upload (ensure it's a valid file)
+            if (isset($data_prestasi['foto_kegiatan']) && is_array($data_prestasi['foto_kegiatan'])) {
+                // Ensure file is uploaded correctly
+                if ($data_prestasi['foto_kegiatan']['error'] == 0) {
+                    // Read file content as binary data
+                    $foto_kegiatan = file_get_contents($data_prestasi['foto_kegiatan']['tmp_name']);
+                } else {
+                    // Handle file upload error
+                    throw new Exception('File upload error: ' . $data_prestasi['foto_kegiatan']['error']);
+                }
+            } else {
+                throw new Exception('No file uploaded.');
+            }
+
+            // Prepare query for inserting data_prestasi
+            $query = "INSERT INTO [dbo].[data_prestasi]
+                    ([tgl_pengajuan], [thn_akademik], [jenis_kompetisi], [juara], 
+                        [tingkat_kompetisi], [judul_kompetisi], [tempat_kompetisi], 
+                        [jumlah_pt], [jumlah_peserta], [status_pengajuan], [foto_kegiatan]) 
+                    VALUES 
+                    (:tgl_pengajuan, :thn_akademik, :jenis_kompetisi, :juara, 
+                        :tingkat_kompetisi, :judul_kompetisi, :tempat_kompetisi, 
+                        :jumlah_pt, :jumlah_peserta, 'Waiting for Approval', :foto_kegiatan)";
+
+            // Prepare and execute the query
+            $stmt = $this->conn->prepare($query);
+
+            // Binding all parameters and execute the query
+            $stmt->execute([
+                ':tgl_pengajuan' => $data_prestasi['tgl_pengajuan'],
+                ':thn_akademik' => $data_prestasi['thn_akademik'],
+                ':jenis_kompetisi' => $data_prestasi['jenis_kompetisi'],
+                ':juara' => $data_prestasi['juara'],
+                ':tingkat_kompetisi' => $data_prestasi['tingkat_kompetisi'],
+                ':judul_kompetisi' => $data_prestasi['judul_kompetisi'],
+                ':tempat_kompetisi' => $data_prestasi['tempat_kompetisi'],
+                ':jumlah_pt' => $data_prestasi['jumlah_pt'],
+                ':jumlah_peserta' => $data_prestasi['jumlah_peserta'],
+                ':foto_kegiatan' => $foto_kegiatan // Use the binary file data here
+            ]);
+
+            // Get the ID of the last inserted record
+            $id_prestasi = $this->conn->lastInsertId();
+
+            // Insert related mahasiswa_ids
+            foreach ($mahasiswa_ids as $id_mahasiswa) {
+                $query_mahasiswa = "INSERT INTO mahasiswa_prestasi (id_mahasiswa, id_prestasi) 
+                                VALUES (:id_mahasiswa, :id_prestasi)";
+                $stmt_mahasiswa = $this->conn->prepare($query_mahasiswa);
+                $stmt_mahasiswa->execute(['id_mahasiswa' => $id_mahasiswa, 'id_prestasi' => $id_prestasi]);
+            }
+
+            // Insert related dosen_ids
+            foreach ($dosen_ids as $id_dosen) {
+                $query_dosen = "INSERT INTO dosen_prestasi (id_dosen, id_prestasi) 
+                            VALUES (:id_dosen, :id_prestasi)";
+                $stmt_dosen = $this->conn->prepare($query_dosen);
+                $stmt_dosen->execute(['id_dosen' => $id_dosen, 'id_prestasi' => $id_prestasi]);
+            }
+
+            // Commit the transaction
+            $this->conn->commit();
+
+            return true;
+        } catch (Exception $e) {
+            // Rollback on error
+            $this->conn->rollBack();
+            // Optionally, log the error message for debugging purposes
+            error_log($e->getMessage());
+            return false;
+        }
+    }
     public function insertPrestasi($data)
 {
+    sqlsrv_begin_transaction($this->conn);
+
     try {
-        // Mulai transaksi
-        $this->conn->beginTransaction();
-
-        // Query untuk insert data prestasi
+        // Insert ke tabel data_prestasi
         $sql = "INSERT INTO [dbo].[data_prestasi] 
-                ([tgl_pengajuan], [program_studi], [thn_akademik], [jenis_kompetisi], [juara], 
-                 [tingkat_kompetisi], [judul_kompetisi], [tempat_kompetisi], [url_kompetisi], 
-                 [jumlah_pt], [jumlah_peserta], [status_pengajuan], [foto_kegiatan],
-                 [no_surat_tugas], [tgl_surat_tugas], [file_surat_tugas],
-                 [file_sertifikat], [file_poster], [lampiran_hasil_kompetisi],[id_mahasiswa]) 
-            VALUES 
-                (:tgl_pengajuan, :program_studi, :thn_akademik, :jenis_kompetisi, :juara, 
-                 :tingkat_kompetisi, :judul_kompetisi, :tempat_kompetisi, :url_kompetisi, 
-                 :jumlah_pt, :jumlah_peserta, 'Waiting for Approval', 
-                 CONVERT(VARBINARY(MAX), :foto_kegiatan), :no_surat_tugas, :tgl_surat_tugas, 
-                 CONVERT(VARBINARY(MAX), :file_surat_tugas), 
-                 CONVERT(VARBINARY(MAX), :file_sertifikat), 
-                 CONVERT(VARBINARY(MAX), :file_poster), 
-                 CONVERT(VARBINARY(MAX), :lampiran_hasil_kompetisi), :id_mahasiswa);";
+            ([tgl_pengajuan], [program_studi], [thn_akademik], [jenis_kompetisi], [juara], 
+             [tingkat_kompetisi], [judul_kompetisi], [tempat_kompetisi], [url_kompetisi], 
+             [jumlah_pt], [jumlah_peserta], [status_pengajuan], [foto_kegiatan],
+             [no_surat_tugas], [tgl_surat_tugas], [file_surat_tugas],
+             [file_sertifikat], [file_poster], [lampiran_hasil_kompetisi], [id_mahasiswa]) 
+        VALUES 
+            (?, ?, ?, ?, ?, 
+             ?, ?, ?, ?, 
+             ?, ?, 'Waiting for Approval', 
+             CONVERT(VARBINARY(MAX), ?),
+             ?, ?, 
+             CONVERT(VARBINARY(MAX), ?),
+             CONVERT(VARBINARY(MAX), ?),
+             CONVERT(VARBINARY(MAX), ?),
+             CONVERT(VARBINARY(MAX), ?), ?);";
 
-        $stmt = $this->conn->prepare($sql);
+        $params = [
+            $data['tgl_pengajuan'],
+            $data['program_studi'],
+            $data['thn_akademik'],
+            $data['jenis_kompetisi'],
+            $data['juara'],
+            $data['tingkat_kompetisi'],
+            $data['judul_kompetisi'],
+            $data['tempat_kompetisi'],
+            $data['url_kompetisi'],
+            $data['jumlah_pt'],
+            $data['jumlah_peserta'],
+            $data['foto_kegiatan'],
+            $data['no_surat_tugas'],
+            $data['tgl_surat_tugas'],
+            $data['file_surat_tugas'],
+            $data['file_sertifikat'],
+            $data['file_poster'],
+            $data['lampiran_hasil_kompetisi'],
+            $data['id_mahasiswa']
+        ];
 
-        // Bind parameter ke query
-        $stmt->execute([
-            ':tgl_pengajuan' => $data['tgl_pengajuan'],
-            ':program_studi' => $data['program_studi'],
-            ':thn_akademik' => $data['thn_akademik'],
-            ':jenis_kompetisi' => $data['jenis_kompetisi'],
-            ':juara' => $data['juara'],
-            ':tingkat_kompetisi' => $data['tingkat_kompetisi'],
-            ':judul_kompetisi' => $data['judul_kompetisi'],
-            ':tempat_kompetisi' => $data['tempat_kompetisi'],
-            ':url_kompetisi' => $data['url_kompetisi'],
-            ':jumlah_pt' => $data['jumlah_pt'],
-            ':jumlah_peserta' => $data['jumlah_peserta'],
-            ':foto_kegiatan' => $data['foto_kegiatan'], // harus dalam format biner
-            ':no_surat_tugas' => $data['no_surat_tugas'],
-            ':tgl_surat_tugas' => $data['tgl_surat_tugas'],
-            ':file_surat_tugas' => $data['file_surat_tugas'], // harus dalam format biner
-            ':file_sertifikat' => $data['file_sertifikat'],   // harus dalam format biner
-            ':file_poster' => $data['file_poster'],           // harus dalam format biner
-            ':lampiran_hasil_kompetisi' => $data['lampiran_hasil_kompetisi'],
-            ':id_mahasiswa' => $data['id_mahasiswa'] // harus dalam format biner
-        ]);
+        $stmt = sqlsrv_query($this->conn, $sql, $params);
+        if (!$stmt) {
+            throw new Exception('Insert ke data_prestasi gagal: ' . print_r(sqlsrv_errors(), true));
+        }
 
         // Ambil ID terbaru dari data_prestasi
-        $id_prestasi = $this->conn->lastInsertId();
+        $query = "SELECT @@IDENTITY AS id_prestasi";
+        $stmt = sqlsrv_query($this->conn, $query);
+        if (!$stmt) {
+            throw new Exception('Gagal menjalankan @@IDENTITY: ' . print_r(sqlsrv_errors(), true));
+        }
+        $row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC);
+        $id_prestasi = $row['id_prestasi'];
 
-        // Insert data mahasiswa
+        // Insert ke tabel prestasi_mahasiswa (multi-input)
         $sql_mahasiswa = "INSERT INTO [dbo].[prestasi_mahasiswa] 
-                          ([id_mahasiswa], [id_prestasi], [peran_mahasiswa]) 
-                          VALUES (:id_mahasiswa, :id_prestasi, :peran_mahasiswa)";
-
-        $stmt_mahasiswa = $this->conn->prepare($sql_mahasiswa);
+            ([id_mahasiswa], [id_prestasi], [peran_mahasiswa]) 
+        VALUES (?, ?, ?)";
         foreach ($data['mahasiswa_data'] as $mahasiswa) {
-            $stmt_mahasiswa->execute([
-                ':id_mahasiswa' => $mahasiswa['id_mahasiswa'],
-                ':id_prestasi' => $id_prestasi,
-                ':peran_mahasiswa' => $mahasiswa['peran_mahasiswa'],
+            $stmt_mahasiswa = sqlsrv_query($this->conn, $sql_mahasiswa, [
+                $mahasiswa['id_mahasiswa'],
+                $id_prestasi,
+                $mahasiswa['peran_mahasiswa']
             ]);
+            if (!$stmt_mahasiswa) {
+                throw new Exception('Insert ke prestasi_mahasiswa gagal: ' . print_r(sqlsrv_errors(), true));
+            }
         }
 
-        // Insert data dosen
+        // Insert ke tabel pembimbing_prestasi (multi-input)
         $sql_pembimbing = "INSERT INTO [dbo].[pembimbing_prestasi] 
-                           ([id_dosen], [id_prestasi], [peran_pembimbing]) 
-                           VALUES (:id_dosen, :id_prestasi, :peran_pembimbing)";
-
-        $stmt_pembimbing = $this->conn->prepare($sql_pembimbing);
+            ([id_dosen], [id_prestasi], [peran_pembimbing]) 
+        VALUES (?, ?, ?)";
         foreach ($data['dosen_data'] as $dosen) {
-            $stmt_pembimbing->execute([
-                ':id_dosen' => $dosen['id_dosen'],
-                ':id_prestasi' => $id_prestasi,
-                ':peran_pembimbing' => $dosen['peran_pembimbing'],
+            $stmt_pembimbing = sqlsrv_query($this->conn, $sql_pembimbing, [
+                $dosen['id_dosen'],
+                $id_prestasi,
+                $dosen['peran_pembimbing']
             ]);
+            if (!$stmt_pembimbing) {
+                throw new Exception('Insert ke pembimbing_prestasi gagal: ' . print_r(sqlsrv_errors(), true));
+            }
         }
 
-        // Commit transaksi
-        $this->conn->commit();
+        sqlsrv_commit($this->conn);
         return true;
-
-    } catch (PDOException $e) {
-        // Rollback jika terjadi error
-        $this->conn->rollBack();
+    } catch (Exception $e) {
+        sqlsrv_rollback($this->conn);
         error_log('SQL Error: ' . $e->getMessage());
         return false;
     }
@@ -153,300 +380,276 @@ class PrestasiModel
 
 
 
-    public function getPrestasiById($id_prestasi)
+    public function updatePrestasi($id_prestasi, $data_prestasi)
     {
-        // Query untuk mendapatkan data prestasi
-        $query = "SELECT 
-        dp.id_prestasi, 
-        dp.tgl_pengajuan,
-        dp.program_studi,
-        dp.url_kompetisi,
-        dp.thn_akademik, 
-        dp.jenis_kompetisi, 
-        dp.juara, 
-        dp.tingkat_kompetisi, 
-        dp.judul_kompetisi, 
-        dp.tempat_kompetisi, 
-        dp.jumlah_pt, 
-        dp.jumlah_peserta, 
-        dp.status_pengajuan,
-        dp.no_surat_tugas,
-        dp.tgl_surat_tugas,
-        dp.file_surat_tugas,
-        dp.file_sertifikat,
-        dp.foto_kegiatan,
-        dp.file_poster,
-        dp.lampiran_hasil_kompetisi
+        $sql = "UPDATE [dbo].[data_prestasi] 
+            SET 
+                [tgl_pengajuan] = ?,
+                [thn_akademik] = ?,
+                [program_studi] = ?,
+                [jenis_kompetisi] = ?,
+                [juara] = ?,
+                [tingkat_kompetisi] = ?,
+                [judul_kompetisi] = ?,
+                [tempat_kompetisi] = ?,
+                [url_kompetisi] = ?,
+                [jumlah_pt] = ?,
+                [jumlah_peserta] = ?,
+                [status_pengajuan] = ?          
+            WHERE [id_prestasi] = ?";
 
-    FROM 
-        data_prestasi dp
-    WHERE dp.id_prestasi = :id_prestasi";
+        $params = [
+            $data_prestasi['tgl_pengajuan'],
+            $data_prestasi['program_studi'],
+            $data_prestasi['thn_akademik'],
+            $data_prestasi['jenis_kompetisi'],
+            $data_prestasi['juara'],
+            $data_prestasi['tingkat_kompetisi'],
+            $data_prestasi['judul_kompetisi'],
+            $data_prestasi['tempat_kompetisi'],
+            $data_prestasi['url_kompetisi'],
+            $data_prestasi['jumlah_pt'],
+            $data_prestasi['jumlah_peserta'],
+            $data_prestasi['status_pengajuan'],
+            $id_prestasi
+        ];
 
-        $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(':id_prestasi', $id_prestasi, PDO::PARAM_INT);
-        $stmt->execute();
+        $stmt = sqlsrv_query($this->conn, $sql, $params);
 
-        $prestasi = $stmt->fetch(PDO::FETCH_ASSOC);
-
-        $queryMahasiswa = "SELECT m.nama_mahasiswa
-                       FROM mahasiswa m
-                       INNER JOIN prestasi_mahasiswa mp ON m.id_mahasiswa = mp.id_mahasiswa
-                       WHERE mp.id_prestasi = :id_prestasi";
-        $stmtMahasiswa = $this->conn->prepare($queryMahasiswa);
-        $stmtMahasiswa->bindParam(':id_prestasi', $id_prestasi, PDO::PARAM_INT);
-        $stmtMahasiswa->execute();
-        $mahasiswa = $stmtMahasiswa->fetchAll(PDO::FETCH_COLUMN);
-
-        $queryDosen = "SELECT d.nama_dosen
-                   FROM dosen d
-                   INNER JOIN pembimbing_prestasi dpd ON d.id_dosen = dpd.id_dosen
-                   WHERE dpd.id_prestasi = :id_prestasi";
-        $stmtDosen = $this->conn->prepare($queryDosen);
-        $stmtDosen->bindParam(':id_prestasi', $id_prestasi, PDO::PARAM_INT);
-        $stmtDosen->execute();
-        $dosen = $stmtDosen->fetchAll(PDO::FETCH_COLUMN);
-
-        $prestasi['nama_mahasiswa'] = implode('<br>', $mahasiswa);
-        $prestasi['nama_dosen'] = implode('<br>', $dosen);
-
-        return $prestasi;
-    }
-
-
-
-    public function getAllMahasiswa()
-    {
-        $query = "SELECT * FROM mahasiswa";
-        $stmt = $this->conn->prepare($query);
-        $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
-    
-    public function getAllDosen()
-    {
-        $query = "SELECT * FROM dosen";
-        $stmt = $this->conn->prepare($query);
-        $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
-    
-    public function addPrestasi($data_prestasi, $mahasiswa_ids, $dosen_ids, $files)
-{
-    try {
-        $this->conn->beginTransaction();
-
-        $data_prestasi['tgl_pengajuan'] = date('Y-m-d H:i:s');
-
-        var_dump($data_prestasi['tgl_pengajuan']);
-
-        // Menangani file upload dan mengubah file menjadi data biner
-        $file_surat_tugas = $this->uploadFileAsBinary($files['surat_tugas']);
-        $file_sertifikat = $this->uploadFileAsBinary($files['sertifikat']);
-        $foto_kegiatan = $this->uploadFileAsBinary($files['foto_kegiatan']);
-        $file_poster = $this->uploadFileAsBinary($files['poster']);
-        $lampiran_hasil_kompetisi = $this->uploadFileAsBinary($files['lampiran_hasil_kompetisi']);
-
-        // Cek jika tanggal_selesai tidak kosong, jika kosong set dengan NULL
-        $tanggal_selesai = isset($data_prestasi['tanggal_selesai']) && !empty($data_prestasi['tanggal_selesai'])
-        ? $data_prestasi['tanggal_selesai']
-        : '1900-01-01';
-
-        // Menambahkan status_pengajuan ke dalam data_prestasi
-        $status_pengajuan = $data_prestasi['status_pengajuan'] ?? 'belum disetujui'; // Default value jika kosong
-
-        // Simpan data ke database
-        $query = "INSERT INTO data_prestasi 
-            (judul_kompetisi, thn_akademik, jenis_kompetisi, juara, tingkat_kompetisi, tempat_kompetisi, 
-            jumlah_pt, jumlah_peserta, program_studi, url_kompetisi, no_surat_tugas, tgl_surat_tugas,
-            status_pengajuan, tanggal_selesai, file_surat_tugas, file_sertifikat, foto_kegiatan, file_poster, lampiran_hasil_kompetisi) 
-            VALUES 
-            (:judul_kompetisi, :thn_akademik, :jenis_kompetisi, :juara, :tingkat_kompetisi, :tempat_kompetisi, 
-            :jumlah_pt, :jumlah_peserta, :program_studi, :url_kompetisi, :no_surat_tugas, :tgl_surat_tugas,
-            :status_pengajuan, :tanggal_selesai, CONVERT(VARBINARY(MAX), :file_surat_tugas), CONVERT(VARBINARY(MAX), :file_sertifikat), 
-            CONVERT(VARBINARY(MAX), :foto_kegiatan), CONVERT(VARBINARY(MAX), :file_poster), 
-            CONVERT(VARBINARY(MAX), :lampiran_hasil_kompetisi))";
-
-        $stmt = $this->conn->prepare($query);
-        $stmt->setAttribute(PDO::SQLSRV_ATTR_ENCODING, PDO::SQLSRV_ENCODING_SYSTEM);
-        $stmt->execute([ 
-            ':judul_kompetisi' => $data_prestasi['judul_kompetisi'],
-            ':thn_akademik' => $data_prestasi['thn_akademik'],
-            ':jenis_kompetisi' => $data_prestasi['jenis_kompetisi'],
-            ':juara' => $data_prestasi['juara'],
-            ':tingkat_kompetisi' => $data_prestasi['tingkat_kompetisi'],
-            ':tempat_kompetisi' => $data_prestasi['tempat_kompetisi'],
-            ':jumlah_pt' => $data_prestasi['jumlah_pt'],
-            ':jumlah_peserta' => $data_prestasi['jumlah_peserta'],
-            ':program_studi' => $data_prestasi['program_studi'],
-            ':url_kompetisi' => $data_prestasi['url_kompetisi'],
-            ':no_surat_tugas' => $data_prestasi['no_surat_tugas'],
-            ':tgl_surat_tugas' => $data_prestasi['tgl_surat_tugas'],
-            ':status_pengajuan' => $status_pengajuan,
-            ':tanggal_selesai' => $tanggal_selesai,
-            ':file_surat_tugas' => $file_surat_tugas,
-            ':file_sertifikat' => $file_sertifikat,
-            ':foto_kegiatan' => $foto_kegiatan,
-            ':file_poster' => $file_poster,
-            ':lampiran_hasil_kompetisi' => $lampiran_hasil_kompetisi // Menambahkan ID mahasiswa
-        ]);
-
-        // Ambil ID prestasi yang baru saja disimpan
-        $prestasi_id = $this->conn->lastInsertId();
-
-        // Validasi mahasiswa_ids tidak kosong
-        foreach ($mahasiswa_ids as $id_mahasiswa) {
-            $query_mahasiswa = "INSERT INTO mahasiswa_prestasi id_mahasiswa, id_prestasi
-                            VALUES (:id_mahasiswa, :id_prestasi)";
-            $stmt_mahasiswa = $this->conn->prepare($query_mahasiswa);
-            $stmt_mahasiswa->execute(['id_mahasiswa' => $id_mahasiswa, 'id_prestasi' => $id_prestasi]);
+        // Check for execution errors
+        if ($stmt === false) {
+            die(print_r(sqlsrv_errors(), true));
         }
 
-        foreach ($dosen_ids as $id_dosen) {
-            $query_dosen = "INSERT INTO dosen_prestasi id_dosen, id_prestasi
-                        VALUES (:id_dosen, :id_prestasi)";
-            $stmt_dosen = $this->conn->prepare($query_dosen);
-            $stmt_dosen->execute(['id_dosen' => $id_dosen, 'id_prestasi' => $id_prestasi]);
-        }
+        // Commit transaction if using transaction handling, otherwise omit this
+        sqlsrv_commit($this->conn);
 
-        // Commit transaksi
-        $this->conn->commit();
         return true;
-    } catch (Exception $e) {
-        $this->conn->rollBack();
-        throw $e;
-    }
-}
-
-
-    
-
-private function uploadFileAsBinary($file, $saveToLocal = false)
-{
-    if ($file['error'] !== UPLOAD_ERR_OK) {
-        throw new Exception('File upload error: ' . $file['error']);
     }
 
-    // Memastikan file valid sebelum melanjutkan
-    if ($file['size'] > 0 && $file['tmp_name']) {
-        // Jika diset untuk menyimpan di server lokal
-        if ($saveToLocal) {
-            $uploadDir = '../public/uploads/'; // Menentukan direktori tempat file disimpan
-            if (!is_dir($uploadDir)) {
-                mkdir($uploadDir, 0777, true); // Membuat direktori jika belum ada
-            }
-
-            $fileName = basename($file['name']);
-            $targetPath = $uploadDir . $fileName;
-
-            if (!move_uploaded_file($file['tmp_name'], $targetPath)) {
-                throw new Exception('Gagal menyimpan file ke server lokal');
-            }
-        }
-
-        // Mengembalikan file sebagai data biner (untuk disimpan di database)
-        return file_get_contents($file['tmp_name']);
-    }
-
-    return null; // Jika tidak ada file yang diupload
-}
-
-    
-
-
-
-    
     public function deletePrestasi($id_prestasi)
     {
-        $sql = "DELETE FROM data_prestasi WHERE id_prestasi = :id_prestasi";
-        $stmt = $this->conn->prepare($sql);
-        $stmt->bindParam(':id_prestasi', $id_prestasi, PDO::PARAM_INT);
+        $sql = "DELETE FROM data_prestasi WHERE id_prestasi = ?";
 
-        return $stmt->execute();
-    }
+        // Prepare and execute the statement using sqlsrv_query
+        $stmt = sqlsrv_query($this->conn, $sql, [$id_prestasi]);
 
-    public function editPrestasi($id_prestasi, $data_prestasi, $mahasiswa_ids, $dosen_ids)
-    {
-        try {
-            $this->conn->beginTransaction();
-
-            // Update data prestasi
-            $query_update_prestasi = "UPDATE [dbo].[data_prestasi]
-            SET [thn_akademik] = :thn_akademik,
-                [jenis_kompetisi] = :jenis_kompetisi,
-                [juara] = :juara,
-                [tingkat_kompetisi] = :tingkat_kompetisi,
-                [judul_kompetisi] = :judul_kompetisi,
-                [tempat_kompetisi] = :tempat_kompetisi,
-                [jumlah_pt] = :jumlah_pt,
-                [jumlah_peserta] = :jumlah_peserta,
-                [status_pengajuan] = :status_pengajuan
-            WHERE [id_prestasi] = :id_prestasi";
-
-            $stmt = $this->conn->prepare($query_update_prestasi);
-            $data_prestasi['id_prestasi'] = $id_prestasi;
-            $stmt->execute($data_prestasi);
-
-            // Hapus relasi lama di mahasiswa_prestasi
-            $query_delete_mahasiswa = "DELETE FROM mahasiswa_prestasi WHERE id_prestasi = :id_prestasi";
-            $stmt_delete_mahasiswa = $this->conn->prepare($query_delete_mahasiswa);
-            $stmt_delete_mahasiswa->execute(['id_prestasi' => $id_prestasi]);
-
-            // Masukkan relasi baru di mahasiswa_prestasi
-            foreach ($mahasiswa_ids as $id_mahasiswa) {
-                $query_insert_mahasiswa = "INSERT INTO mahasiswa_prestasi (id_mahasiswa, id_prestasi) 
-                                       VALUES (:id_mahasiswa, :id_prestasi)";
-                $stmt_insert_mahasiswa = $this->conn->prepare($query_insert_mahasiswa);
-                $stmt_insert_mahasiswa->execute(['id_mahasiswa' => $id_mahasiswa, 'id_prestasi' => $id_prestasi]);
-            }
-
-            // Hapus relasi lama di dosen_prestasi
-            $query_delete_dosen = "DELETE FROM dosen_prestasi WHERE id_prestasi = :id_prestasi";
-            $stmt_delete_dosen = $this->conn->prepare($query_delete_dosen);
-            $stmt_delete_dosen->execute(['id_prestasi' => $id_prestasi]);
-
-            // Masukkan relasi baru di dosen_prestasi
-            foreach ($dosen_ids as $id_dosen) {
-                $query_insert_dosen = "INSERT INTO dosen_prestasi (id_dosen, id_prestasi) 
-                                   VALUES (:id_dosen, :id_prestasi)";
-                $stmt_insert_dosen = $this->conn->prepare($query_insert_dosen);
-                $stmt_insert_dosen->execute(['id_dosen' => $id_dosen, 'id_prestasi' => $id_prestasi]);
-            }
-
-            $this->conn->commit();
-
-            return true;
-        } catch (Exception $e) {
-            $this->conn->rollBack();
-            return false;
+        if ($stmt === false) {
+            die(print_r(sqlsrv_errors(), true)); // Handle query failure
         }
+
+        return true; // Return true if the query executed successfully
     }
 
-    public function updateStatusPrestasi($id_prestasi, $status)
-    {
-        $sql = "UPDATE data_prestasi SET status_pengajuan = :status WHERE id_prestasi = :id_prestasi";
-        $stmt = $this->conn->prepare($sql);
-        $stmt->bindParam(':status', $status);
-        $stmt->bindParam(':id_prestasi', $id_prestasi, PDO::PARAM_INT);
-        return $stmt->execute();
+    public function getPrestasiById($id_prestasi)
+{
+    // Query utama untuk mendapatkan data prestasi
+    $query = "SELECT 
+        *
+    FROM 
+        data_prestasi dp
+    WHERE dp.id_prestasi = ?";
+
+    // Menyiapkan dan menjalankan query utama
+    $stmt = sqlsrv_query($this->conn, $query, [$id_prestasi]);
+    if ($stmt === false) {
+        die(print_r(sqlsrv_errors(), true));
     }
 
-    public function insertHistoryApproval($id_prestasi, $status, $alasan = null)
-    {
-        $sql = "INSERT INTO history_approval (id_prestasi, status_approval, alasan) 
-                VALUES (:id_prestasi, :status_approval, :alasan)";
-        $stmt = $this->conn->prepare($sql);
-        $stmt->bindParam(':id_prestasi', $id_prestasi);
-        $stmt->bindParam(':status_approval', $status);
-        $stmt->bindParam(':alasan', $alasan);
-        return $stmt->execute();
+    // Mengambil hasil query utama
+    $prestasi = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC);
+
+    // Query untuk mendapatkan nama mahasiswa
+    $queryMahasiswa = "SELECT m.nama_mahasiswa
+                       FROM mahasiswa m
+                       INNER JOIN prestasi_mahasiswa mp ON m.id_mahasiswa = mp.id_mahasiswa
+                       WHERE mp.id_prestasi = ?";
+    $stmtMahasiswa = sqlsrv_query($this->conn, $queryMahasiswa, [$id_prestasi]);
+    if ($stmtMahasiswa === false) {
+        die(print_r(sqlsrv_errors(), true));
     }
 
-    public function getApprovalHistory($id_prestasi)
+    $mahasiswa = [];
+    while ($row = sqlsrv_fetch_array($stmtMahasiswa, SQLSRV_FETCH_ASSOC)) {
+        $mahasiswa[] = $row['nama_mahasiswa'];
+    }
+
+    // Query untuk mendapatkan nama dosen
+    $queryDosen = "SELECT d.nama_dosen
+                   FROM dosen d
+                   INNER JOIN pembimbing_prestasi dpd ON d.id_dosen = dpd.id_dosen
+                   WHERE dpd.id_prestasi = ?";
+    $stmtDosen = sqlsrv_query($this->conn, $queryDosen, [$id_prestasi]);
+    if ($stmtDosen === false) {
+        die(print_r(sqlsrv_errors(), true));
+    }
+
+    $dosen = [];
+    while ($row = sqlsrv_fetch_array($stmtDosen, SQLSRV_FETCH_ASSOC)) {
+        $dosen[] = $row['nama_dosen'];
+    }
+
+    // Menyusun hasil akhir
+    $prestasi['nama_mahasiswa'] = implode('<br>', $mahasiswa);
+    $prestasi['nama_dosen'] = implode('<br>', $dosen);
+
+    return $prestasi;
+}
+
+
+    public function getPrestasiByDosen($id_dosen, $role)
     {
-        $sql = "SELECT * FROM history_approval WHERE id_prestasi = :id_prestasi ORDER BY tgl_approval DESC";
-        $stmt = $this->conn->prepare($sql);
-        $stmt->bindParam(':id_prestasi', $id_prestasi, PDO::PARAM_INT);
+        if ($role === 'admin') {
+            // Query untuk admin: Menampilkan semua data prestasi
+            $query = "SELECT * FROM data_prestasi dp 
+                  INNER JOIN pembimbing_prestasi pp 
+                  ON dp.id_prestasi = pp.id_prestasi 
+                  ORDER BY dp.tgl_pengajuan DESC";
+            $stmt = $this->conn->prepare($query);
+        } else {
+            // Query untuk dosen atau ketua jurusan: Filter berdasarkan id_dosen
+            $query = "SELECT * FROM data_prestasi dp 
+                  INNER JOIN pembimbing_prestasi pp 
+                  ON dp.id_prestasi = pp.id_prestasi 
+                  WHERE pp.id_dosen = :id_dosen 
+                  ORDER BY dp.tgl_pengajuan DESC";
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(':id_dosen', $id_dosen, PDO::PARAM_INT);
+        }
+
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
+    public function getPrestasiByMahasiswa($id_mahasiswa)
+{
+    // Query dengan parameter
+    $query = "SELECT * FROM data_prestasi WHERE id_mahasiswa = ? ORDER BY tgl_pengajuan DESC";
+
+    // Parameter untuk query
+    $params = [$id_mahasiswa];
+
+    // Menyiapkan dan mengeksekusi query
+    $stmt = sqlsrv_query($this->conn, $query, $params);
+
+    if ($stmt === false) {
+        // Menangani error jika query gagal
+        die(print_r(sqlsrv_errors(), true));
+    }
+
+    // Mengambil hasil query
+    $prestasiList = [];
+    while ($row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC)) {
+        $prestasiList[] = $row;
+    }
+
+    // Mengembalikan hasil sebagai array asosiatif
+    return $prestasiList;
+}
+
+public function editPrestasi($id_prestasi, $data)
+{
+    sqlsrv_begin_transaction($this->conn);
+
+    try {
+        // Update data prestasi
+        $sql = "UPDATE [dbo].[data_prestasi]
+                SET 
+                    [tgl_pengajuan] = ?, 
+                    [program_studi] = ?, 
+                    [thn_akademik] = ?, 
+                    [jenis_kompetisi] = ?, 
+                    [juara] = ?, 
+                    [tingkat_kompetisi] = ?, 
+                    [judul_kompetisi] = ?, 
+                    [tempat_kompetisi] = ?, 
+                    [url_kompetisi] = ?, 
+                    [jumlah_pt] = ?, 
+                    [jumlah_peserta] = ?, 
+                    [foto_kegiatan] = CONVERT(VARBINARY(MAX), ?),
+                    [no_surat_tugas] = ?, 
+                    [tgl_surat_tugas] = ?, 
+                    [file_surat_tugas] = CONVERT(VARBINARY(MAX), ?),
+                    [file_sertifikat] = CONVERT(VARBINARY(MAX), ?),
+                    [file_poster] = CONVERT(VARBINARY(MAX), ?),
+                    [lampiran_hasil_kompetisi] = CONVERT(VARBINARY(MAX), ?)
+                WHERE [id_prestasi] = ?";
+
+        $params = [
+            $data['tgl_pengajuan'],
+            $data['program_studi'],
+            $data['thn_akademik'],
+            $data['jenis_kompetisi'],
+            $data['juara'],
+            $data['tingkat_kompetisi'],
+            $data['judul_kompetisi'],
+            $data['tempat_kompetisi'],
+            $data['url_kompetisi'],
+            $data['jumlah_pt'],
+            $data['jumlah_peserta'],
+            $data['foto_kegiatan'],
+            $data['no_surat_tugas'],
+            $data['tgl_surat_tugas'],
+            $data['file_surat_tugas'],
+            $data['file_sertifikat'],
+            $data['file_poster'],
+            $data['lampiran_hasil_kompetisi'],
+            $id_prestasi
+        ];
+
+        $stmt = sqlsrv_query($this->conn, $sql, $params);
+        if (!$stmt) {
+            throw new Exception('Update data prestasi gagal: ' . print_r(sqlsrv_errors(), true));
+        }
+
+        // Hapus data mahasiswa dan dosen lama dari tabel terkait
+        $delete_mahasiswa_sql = "DELETE FROM [dbo].[prestasi_mahasiswa] WHERE [id_prestasi] = ?";
+        $delete_dosen_sql = "DELETE FROM [dbo].[pembimbing_prestasi] WHERE [id_prestasi] = ?";
+
+        $stmt_mahasiswa = sqlsrv_query($this->conn, $delete_mahasiswa_sql, [$id_prestasi]);
+        if (!$stmt_mahasiswa) {
+            throw new Exception('Hapus data mahasiswa gagal: ' . print_r(sqlsrv_errors(), true));
+        }
+
+        $stmt_dosen = sqlsrv_query($this->conn, $delete_dosen_sql, [$id_prestasi]);
+        if (!$stmt_dosen) {
+            throw new Exception('Hapus data dosen gagal: ' . print_r(sqlsrv_errors(), true));
+        }
+
+        // Insert data mahasiswa baru
+        $sql_mahasiswa = "INSERT INTO [dbo].[prestasi_mahasiswa] ([id_mahasiswa], [id_prestasi], [peran_mahasiswa]) 
+                          VALUES (?, ?, ?)";
+        foreach ($data['mahasiswa_data'] as $mahasiswa) {
+            $stmt_mahasiswa = sqlsrv_query($this->conn, $sql_mahasiswa, [
+                $mahasiswa['id_mahasiswa'],
+                $id_prestasi,
+                $mahasiswa['peran_mahasiswa']
+            ]);
+            if (!$stmt_mahasiswa) {
+                throw new Exception('Insert ke prestasi_mahasiswa gagal: ' . print_r(sqlsrv_errors(), true));
+            }
+        }
+
+        // Insert data dosen baru
+        $sql_pembimbing = "INSERT INTO [dbo].[pembimbing_prestasi] ([id_dosen], [id_prestasi], [peran_pembimbing]) 
+                           VALUES (?, ?, ?)";
+        foreach ($data['dosen_data'] as $dosen) {
+            $stmt_pembimbing = sqlsrv_query($this->conn, $sql_pembimbing, [
+                $dosen['id_dosen'],
+                $id_prestasi,
+                $dosen['peran_pembimbing']
+            ]);
+            if (!$stmt_pembimbing) {
+                throw new Exception('Insert ke pembimbing_prestasi gagal: ' . print_r(sqlsrv_errors(), true));
+            }
+        }
+
+        sqlsrv_commit($this->conn);
+        return ['success' => true];
+    } catch (Exception $e) {
+        sqlsrv_rollback($this->conn);
+        error_log('SQL Error: ' . $e->getMessage());
+        return ['success' => false, 'message' => $e->getMessage()];
+    }
+}
 }
